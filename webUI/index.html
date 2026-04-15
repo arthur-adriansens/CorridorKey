@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>CorridorKey web UI</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+
+    <body class="bg-zinc-950 text-zinc-200 h-screen overflow-hidden">
+        <!-- TOP BAR -->
+        <header class="h-11 flex items-center justify-between px-3 bg-zinc-900 border-b border-zinc-800">
+            <div class="flex items-center gap-3">
+                <span class="font-semibold text-sm">CorridorKey web UI</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button class="px-3 py-1 text-xs bg-zinc-800 border border-zinc-700 rounded">Import</button>
+                <button class="px-3 py-1 text-xs bg-zinc-800 border border-zinc-700 rounded">Export</button>
+                <button class="px-3 py-1 text-xs font-semibold bg-blue-500 text-black rounded">Run</button>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT -->
+        <main class="grid h-[calc(100vh-72px)]" style="grid-template-columns: 260px 1fr 320px" id="layout">
+            <!-- LEFT SIDEBAR -->
+            <aside class="bg-zinc-900 p-3 text-sm relative" id="left">
+                <div class="mb-4">
+                    <h2 class="text-xs uppercase text-zinc-400 mb-2">Queue</h2>
+                    <ul class="space-y-1">
+                        <li class="px-2 py-1 rounded bg-blue-500 text-black">greenscreen_take_01.mp4</li>
+                        <li class="px-2 py-1 rounded hover:bg-zinc-800">greenscreen_take_02.mp4</li>
+                        <li class="px-2 py-1 rounded hover:bg-zinc-800">pickup_shot.mov</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2 class="text-xs uppercase text-zinc-400 mb-2">Sessions</h2>
+                    <ul class="space-y-1">
+                        <li class="px-2 py-1 rounded hover:bg-zinc-800">Session 01</li>
+                        <li class="px-2 py-1 rounded hover:bg-zinc-800">Session 02</li>
+                    </ul>
+                </div>
+
+                <div class="h-full w-20 group absolute -right-10 top-0 select-none">
+                    <div
+                        class="bg-zinc-800 group-hover:bg-zinc-700 mx-auto transition-all h-full w-0.5 group-hover:w-2 cursor-col-resize"
+                        id="left-resizer"
+                    ></div>
+                </div>
+            </aside>
+
+            <!-- CENTER PREVIEW -->
+            <div class="flex flex-col bg-zinc-950">
+                <!-- VIEW TOOLBAR -->
+                <div class="flex items-center gap-2 px-3 py-2 bg-zinc-900 border-b border-zinc-800 text-xs">
+                    <span class="text-zinc-400">View</span>
+                    <button class="px-2 py-1 bg-zinc-800 rounded">Original</button>
+                    <button class="px-2 py-1 bg-zinc-800 rounded">Alpha</button>
+                    <button class="px-2 py-1 bg-blue-500 text-black rounded font-medium">Composite</button>
+                </div>
+
+                <!-- PREVIEW CANVAS -->
+                <div class="flex-1 flex items-center justify-center p-4">
+                    <div class="w-full h-full border-2 border-dashed border-zinc-800 rounded flex items-center justify-center text-zinc-500">
+                        Preview
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT CONTROLS -->
+            <aside class="bg-zinc-9000 p-3 text-sm relative" id="right">
+                <div class="h-full w-20 group absolute -left-10 top-0 select-none">
+                    <div
+                        class="bg-zinc-800 group-hover:bg-zinc-700 mx-auto transition-all h-full w-0.5 group-hover:w-2 cursor-col-resize"
+                        id="right-resizer"
+                    ></div>
+                </div>
+
+                <form class="overflow-y-auto space-y-6">
+                    <!-- MODEL -->
+                    <fieldset class="flex flex-col gap-2">
+                        <legend class="text-md font-medium uppercase text-zinc-400 mb-3">Model</legend>
+
+                        <label class="text-zinc-400 text-sm" for="backend">Backend</label>
+                        <select id="backend" class="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded px-2 py-1">
+                            <option>CorridorKey</option>
+                            <option>CorridorKey Lite</option>
+                            <option>MLX</option>
+                        </select>
+                    </fieldset>
+
+                    <!-- KEYING -->
+                    <fieldset class="flex flex-col gap-2" id="dynamic-labels">
+                        <legend class="text-md font-medium uppercase text-zinc-400 mb-3">Keying</legend>
+
+                        <label class="text-zinc-400 text-sm" for="despill">Despill: <span id="despill-label"></span></label>
+                        <input type="range" min="0.0" max="1.0" step="0.1" class="w-full" id="despill" />
+
+                        <label class="text-zinc-400 text-sm" for="refiner">Refiner: <span id="refiner-label"></span></label>
+                        <input type="range" min="0.0" max="3.0" step="0.1" value="1.0" class="w-full" id="refiner" />
+                    </fieldset>
+
+                    <!-- OUTPUT -->
+                    <fieldset class="flex flex-col gap-2">
+                        <legend class="text-md font-medium uppercase text-zinc-400 mb-3">Output</legend>
+
+                        <label class="text-zinc-400 text-sm" for="format">Format</label>
+                        <select id="format" class="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded px-2 py-1">
+                            <option>EXR (RGBA)</option>
+                            <option>PNG Sequence</option>
+                            <option>ProRes 4444</option>
+                        </select>
+
+                        <label class="text-zinc-400 text-sm" for="resolution">Resolution</label>
+                        <select id="resolution" class="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded px-2 py-1">
+                            <option>Source</option>
+                            <option>Half</option>
+                            <option>Quarter</option>
+                        </select>
+                    </fieldset>
+                </form>
+            </aside>
+        </main>
+
+        <!-- STATUS BAR -->
+        <footer class="h-8 flex items-center justify-between px-3 bg-zinc-900 border-t border-zinc-800 text-xs text-zinc-400">
+            <span>Status: Idle</span>
+            <span>GPU: Ready</span>
+        </footer>
+
+        <script>
+            // Dynamic label that show input slider's value
+
+            const sliders = document.querySelectorAll("#dynamic-labels input");
+
+            const updateDynamicLabel = (input) => {
+                const span = input.parentNode.querySelector(`#${input.id}-label`);
+                span.textContent = input.value;
+            };
+
+            sliders.forEach((input) => {
+                updateDynamicLabel(input);
+                input.oninput = () => updateDynamicLabel(input);
+            });
+
+            // Resizable sidepannel
+
+            const layout = document.getElementById("layout");
+            const leftResizer = document.getElementById("left-resizer");
+            const rightResizer = document.getElementById("right-resizer");
+
+            let dragTarget = null;
+
+            const MIN_LEFT = 180;
+            const MIN_RIGHT = 240;
+            const MIN_CENTER = 400;
+
+            function getGrid() {
+                return getComputedStyle(layout)
+                    .gridTemplateColumns.split(" ")
+                    .map((v) => parseFloat(v));
+            }
+
+            document.addEventListener("mousedown", (e) => {
+                if (e.target === leftResizer) dragTarget = "left";
+                if (e.target === rightResizer) dragTarget = "right";
+            });
+
+            document.addEventListener("mouseup", () => {
+                dragTarget = null;
+            });
+
+            document.addEventListener("mousemove", (e) => {
+                if (!dragTarget) return;
+
+                const rect = layout.getBoundingClientRect();
+                let [left, center, right] = getGrid();
+
+                if (dragTarget === "left") {
+                    const newLeft = e.clientX - rect.left;
+
+                    center += left - newLeft;
+                    if (newLeft < MIN_LEFT || center < MIN_CENTER) return;
+
+                    left = newLeft;
+                }
+
+                if (dragTarget === "right") {
+                    const newRight = rect.right - e.clientX;
+
+                    center += right - newRight;
+                    if (newRight < MIN_RIGHT || center < MIN_CENTER) return;
+
+                    right = newRight;
+                }
+
+                layout.style.gridTemplateColumns = `${left}px ${center}px ${right}px`;
+            });
+        </script>
+    </body>
+</html>
