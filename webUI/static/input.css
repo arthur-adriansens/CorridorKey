@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
+
+* {
+    @apply border-corridor-border;
+}
+
+select,
+option,
+input[type="range"],
+li {
+    @apply cursor-pointer outline-none;
+}
+
+#left-resizer::before,
+#right-resizer::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(65%, -50%);
+    width: 2.5px;
+    height: 15px;
+    border-inline-start: 0.5px solid white;
+
+    opacity: 0;
+    @apply transition-opacity;
+}
+
+#left-resizer::before {
+    transform: translate(-90%, -50%);
+}
+
+.group:hover>div::before {
+    opacity: 1 !important;
+}
+
+/* vram danger animation */
+
+#vram-bar.danger {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Buttons */
+
+.btn-primary {
+    @apply rounded bg-corridor-blue text-black hover:text-white py-2 text-sm font-semibold transition-colors;
+}
+
+.btn-primary-sm {
+    @apply rounded bg-corridor-blue text-black hover:text-white px-3 py-1 text-xs font-semibold transition-colors;
+}
+
+.btn-secondary {
+    @apply rounded bg-zinc-800 text-zinc-200 py-2 text-sm hover:bg-zinc-700 transition-colors;
+}
+
+.btn-secondary-sm {
+    @apply rounded bg-zinc-800 text-zinc-200 px-3 py-1 text-xs hover:bg-zinc-700 border hover:border-blue-500 transition-colors
+}
+
+.btn-outline {
+    @apply rounded border border-zinc-700 text-zinc-300 py-2 text-sm hover:bg-zinc-800 transition;
+}
+
+/* Scrollbar styling from corridordigital.com */
+
+::-webkit-scrollbar {
+    width: 16px;
+}
+
+::-webkit-scrollbar-thumb {
+    height: 56px;
+    border-radius: 8px;
+    border: 4px solid transparent;
+    background-clip: content-box;
+    background-color: #fff20375;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #fff203;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Collapsable sidebar fieldsets */
+
+fieldset[collapsable]>legend {
+    @apply flex items-center justify-between w-full cursor-pointer mb-4 text-xs font-semibold uppercase tracking-wide text-zinc-500 select-none;
+}
+
+fieldset[collapsable]>legend>span {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzE3MTdhIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0ibTkgMTggNi02LTYtNiIvPjwvc3ZnPg==");
+    @apply size-4 bg-contain rotate-90 transition pointer-events-none;
+}
+
+/* collapsed state */
+fieldset[collapsable][closed]>legend>span {
+    @apply rotate-0;
+}
+
+
+fieldset[collapsable][closed] {
+    @apply h-0 pb-4;
+}
+
+fieldset[collapsable][closed]>:not(legend) {
+    @apply opacity-0 pointer-events-none;
+}

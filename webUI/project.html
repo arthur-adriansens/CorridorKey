@@ -27,15 +27,17 @@
                 <div class="mb-4">
                     <h2 class="text-xs uppercase text-zinc-400 mb-2">Projects</h2>
                     <ul class="space-y-1">
-                        <a href="/project"><li class="px-2 py-1 rounded hover:bg-zinc-800">Clip 1</li></a>
-                        <a href="/project"><li class="px-2 py-1 rounded hover:bg-zinc-800">Clip 2</li></a>
+                        <li class="px-2 py-1 rounded bg-corridor-blue text-black">Clip 1</li>
+                        <li class="px-2 py-1 rounded hover:bg-zinc-800">Clip 2</li>
                     </ul>
                 </div>
 
                 <div>
                     <h2 class="text-xs uppercase text-zinc-400 mb-2">Queue</h2>
                     <ul class="space-y-1">
-                        <li class="px-2 py-1 rounded hover:bg-zinc-800">Nothing in queue</li>
+                        <li class="px-2 py-1 rounded bg-corridor-blue text-black">greenscreen_take_01.mp4</li>
+                        <li class="px-2 py-1 rounded hover:bg-zinc-800">greenscreen_take_02.mp4</li>
+                        <li class="px-2 py-1 rounded hover:bg-zinc-800">pickup_shot.mov</li>
                     </ul>
                 </div>
 
@@ -50,48 +52,26 @@
             <!-- CENTER PREVIEW -->
             <div class="flex flex-col">
                 <!-- VIEW TOOLBAR -->
-                <div class="flex items-center gap-2 px-3 py-2 border-b text-xs" toggle-group>
+                <div class="flex items-center gap-2 px-3 py-2 border-b text-xs overflow-x-auto no-scrollbar" id="views" toggle-group>
                     <p class="text-zinc-400">View</p>
-                    <button class="btn-secondary-sm">Original</button>
+                    <button class="btn-primary-sm">Original</button>
                     <button class="btn-secondary-sm">Mask</button>
                     <button class="btn-secondary-sm">Alpha</button>
                     <button class="btn-secondary-sm">FG</button>
                     <button class="btn-secondary-sm">MATTE</button>
                     <button class="btn-secondary-sm">COMP</button>
-                    <button class="btn-primary-sm">PROC</button>
+                    <button class="btn-secondary-sm">PROC</button>
                 </div>
 
                 <!-- PREVIEW CANVAS -->
-                <label class="flex-1 p-4 bg-corridor-dark !cursor-pointer" id="drop-zone">
+                <div class="flex-1 p-4 bg-corridor-dark">
                     <div
                         class="w-full h-full border-2 border-dashed rounded flex flex-col gap-2 items-center justify-center text-zinc-500 transition-colors"
                         id="preview"
                     >
                         <p>Preview</p>
-                        <p class="border-2 border-dashed rounded p-2 gap-2 flex items-center [&>svg]:size-5">
-                            Drop folder here
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <path
-                                    d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"
-                                />
-                                <path d="M14 2v5a1 1 0 0 0 1 1h5" />
-                                <path d="M12 12v6" />
-                                <path d="m15 15-3-3-3 3" />
-                            </svg>
-                        </p>
                     </div>
-                    <input type="file" id="folder-input" class="hidden" accept="*" webkitdirectory />
-                </label>
+                </div>
 
                 <!-- FRAMES TRACK -->
                 <div class="px-3 py-2 text-xs flex flex-col gap-2 select-none">
@@ -241,5 +221,6 @@
         </footer>
 
         <script src="/static/index.js"></script>
+        <script src="/static/project.js"></script>
     </body>
 </html>

@@ -19,15 +19,15 @@ git clone https://github.com/nikopueringer/CorridorKey.git
 cd CorridorKey
 uv sync --group dev    # installs all dependencies + dev tools (pytest, ruff)
 
-python webUI/server/server.py # start the python server
+uv run uvicorn server:app --host 127.0.0.1 --port 8000 --log-level warning # start the python server (also for development)
 ```
 
 To install tailwindCSS globally and enable tailwind watching to generate the ouput.css file
 
 ```bash
 npm install -g tailwindcss@3 # v4 doesn't really work without a package.json
-cd webUI
-tailwindcss -i input.css -o styles.css --watch
+
+cd webUI && tailwindcss -i static/input.css -o static/styles.css --watch    # run this in a second terminal during development
 ```
 
 That's it.
