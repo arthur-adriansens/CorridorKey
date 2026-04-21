@@ -1,4 +1,4 @@
-# Contributing to CorridorKey web UI
+# CorridorKey web UI
 
 Hi! This web UI was made by Arthur Adriansens. I stepped out of my comfort zone (JavaScripe, Node.js and Astro) to use Python. This UI version doens't use any pip python libraries, only native.
 I wanted to avoid adding any packages to this awesome project, so I only used devDependencies, because I want to use Tailwind CSS for faster development and maintainability.
@@ -10,7 +10,7 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
 - Python 3.10 or newer
 - NPM to install Tailwind for development
 
-### Dev Setup
+### Install
 
 To clone this intire project:
 
@@ -19,8 +19,22 @@ git clone https://github.com/nikopueringer/CorridorKey.git
 cd CorridorKey
 uv sync --group dev    # installs all dependencies + dev tools (pytest, ruff)
 
-uv run uvicorn server:app --host 127.0.0.1 --port 8000 --log-level warning # start the python server (also for development)
+uv run uvicorn webUI.server.server:app --reload # start the python server (also for development)
 ```
+
+Ffmpeg also needs to be installed:
+
+```bash
+winget install "FFmpeg (Essentials Build)"    # Windows
+brew install ffmpeg     # macOS
+sudo apt update && sudo apt install -y ffmpeg   # Ubuntu / Debian
+
+# or: https://ffmpeg.org/download.html
+
+ffmpeg -version
+```
+
+## Dev setup
 
 To install tailwindCSS globally and enable tailwind watching to generate the ouput.css file
 
@@ -31,41 +45,6 @@ cd webUI && tailwindcss -i static/input.css -o static/styles.css --watch    # ru
 ```
 
 That's it.
-
-### Linting and Formatting
-
-```bash
-uv run ruff check          # check for lint errors
-uv run ruff format --check # check formatting (no changes)
-uv run ruff format         # auto-format your code
-```
-
-CI runs both checks on every pull request. Running them locally before pushing saves a round-trip.
-
-## Making Changes
-
-### Pull Requests
-
-1. Fork the repo and create a branch for your change
-2. Make your changes
-3. Run `uv run pytest` and `uv run ruff check` to make sure everything passes
-4. Open a pull request against `main`
-
-In your PR description, focus on **why** you made the change, not just what changed. If you're fixing a bug, describe the symptoms. If you're adding a feature, explain the use case. A couple of sentences is plenty.
-
-### What Makes a Good Contribution
-
-- **Bug fixes** — especially for edge cases in EXR/linear workflows, color space handling, or platform-specific issues
-- **Tests** — more test coverage is always welcome, particularly for `clip_manager.py` and `inference_engine.py`
-- **Documentation** — better explanations, usage examples, or clarifying comments in tricky code
-- **Performance** — reducing GPU memory usage, speeding up frame processing, or optimizing I/O
-
-### Code Style
-
-- The project uses [ruff](https://docs.astral.sh/ruff/) for both linting and formatting
-- Lint rules: `E, F, W, I, B` (basic style, unused imports, import sorting, common bug patterns)
-- Line length: 120 characters
-- Third-party code in `gvm_core/` and `VideoMaMaInferenceModule/` is excluded from lint enforcement — those are derived from research repos and we try to keep them close to upstream
 
 ## Questions?
 

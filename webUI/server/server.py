@@ -1,132 +1,93 @@
-from wsgiref.simple_server import make_server
-from urllib.parse import parse_qs
+
+from backend.ffmpeg_tools import probe_video, find_ffmpeg
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.staticfiles import StaticFiles
 from dataclasses import asdict
 from pathlib import Path
-import mimetypes
 import json
-
 import sys
 import os
+
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../..")))
 
 # Import corridorKey logic
 import device_utils
 import clip_manager
 
-    
-ROOT = Path(__file__).resolve().parent.parent  # project root
+# Project root
+ROOT = Path(__file__).resolve().parent.parent 
+MEDIA_ROOT = Path("C:/Users/arthu/AppData/Roaming/EZ-CorridorKey").resolve()
+
 print(ROOT)
 
+app = FastAPI() 
 
-# MAIN SERVER CODE
+print("Server started.")
 
-def server(environ, start_response):
-    path = environ.get("PATH_INFO", "/")
+# -------------------
+# API
+# -------------------
 
-    # ---- API ----
-    if path == "/api/health":
-        return getHealth(start_response)
+@app.get("/api/health")
+def health():
+    return {"status": "Online"}
 
-    if path == "/api/GPUs":
-        return getGPUs(start_response)
-
-    if path == "/api/projectInfo":
-        return getProject(environ, start_response)
-
-    # ---- STATIC FILES ----
-    if path.startswith("/media/"):
-        return getMediaFile(path, start_response)
-
-    if path == "/":
-        path = "/index.html"
-    elif path == "/project":
-        path = "/project.html"
+@app.get("/api/GPUs")
+def gpus():
+    gpus = device_utils.enumerate_gpus()
+    return [asdict(gpu) for gpu in gpus]
 
 
-    return getStaticFilePath(path, start_response)
+@app.get("/api/projectInfo")
+def project_info(project: str, path: str):
+    # get project path
+    # with open("data.json", "w") as f:
+    #     json.dump(data, f)
 
-
-# STATIC API PORTS
-
-def getStaticFilePath(path, start_response):
-    file_path = (ROOT / path.lstrip("/")).resolve()
-
-    # prevent directory traversal
-    if not file_path.is_file() or ROOT not in file_path.parents:
-        start_response("404 Not Found", [("Content-Type", "text/plain")])
-        return [b"Not found"]
-
-    content_type, _ = mimetypes.guess_type(file_path)
-    content_type = content_type or "application/octet-stream"
-
-    start_response("200 OK", [("Content-Type", content_type)])
-    return [file_path.read_bytes()]
-
-
-def getMediaFile(path, start_response):
-    MEDIA_ROOT = Path("C:/Users/arthu/AppData/Roaming/EZ-CorridorKey").resolve()
+    file_path = (MEDIA_ROOT / path).resolve()
+    print("path", file_path)
     
-    # Strip "/media/"
-    rel_path = path.replace("/media/", "", 1)
+    # get original video fps
+    fps = 0
+    if find_ffmpeg():
+        try:
+            video_info = probe_video(file_path)
+            fps = video_info.get("fps", 24.0)
+        except:
+            print("Error probing video, using default fps of 24.0")
+    else:
+        print("ffmpeg not found, using default fps of 24.0")
 
-    file_path = (MEDIA_ROOT / rel_path).resolve()
+    # clips = clip_manager.scan_clips()
+
+    return {"fps": fps}
+
+# -------------------
+# Media files
+# -------------------
+
+@app.get("/media/{path:path}")
+def media_file(path: str):
+    file_path = (MEDIA_ROOT / path).resolve()
 
     # Security check: prevent escaping MEDIA_ROOT
     if not file_path.is_file() or MEDIA_ROOT not in file_path.parents:
-        start_response("404 Not Found", [("Content-Type", "text/plain")])
-        return [b"Not found"]
+        raise HTTPException(status_code=404)
 
-    content_type, _ = mimetypes.guess_type(file_path)
-    content_type = content_type or "application/octet-stream"
+    return FileResponse(file_path)
 
-    headers = [
-        ("Content-Type", content_type),
-        ("Content-Length", str(file_path.stat().st_size)),
-        ("Accept-Ranges", "bytes"),
-    ]
+# -------------------
+# Static files
+# -------------------
 
-    start_response("200 OK", headers)
-    return [file_path.read_bytes()]
+@app.get("/")
+def index_page():
+    return FileResponse(ROOT / "index.html")
 
-
-# HELPER FUNCTIONS / PORTS
-
-def getHealth(start_response):
-    start_response("200 OK", [("Content-Type", "application/json")])
-
-    return [json.dumps({"status": "Online"}).encode()]
-
-def getGPUs(start_response):
-    gpus = device_utils.enumerate_gpus()
-    json_ready = [asdict(gpu) for gpu in gpus]
-
-    json_bytes = json.dumps(json_ready).encode("utf-8")
-    start_response("200 OK", [
-        ("Content-Type", "application/json"),
-        ("Content-Length", str(len(json_bytes))),
-        ("Cache-Control", "no-store"),
-    ])
-
-    return [json_bytes]
-
-def getProject(environ, start_response):
-    query_string  = parse_qs(environ.get('QUERY_STRING'))
-    print(query_string)
-
-    test = clip_manager.scan_clips()
-    print(test)
-
-    # get project path
-    
-    # get original video + fps(!!)
-
-    start_response("200 OK", [("Content-Type", "application/json")])
-    return [json.dumps({"status": "Online"}).encode()]
+@app.get("/project")
+def project_page():
+    return FileResponse(ROOT / "project.html")
 
 
-
-# START SERVER
-
-if __name__ == "__main__":
-    print("Serving on http://localhost:8000")
-    make_server("localhost", 8000, server).serve_forever()
+app.mount("/", StaticFiles(directory=ROOT, html=True), name="static")

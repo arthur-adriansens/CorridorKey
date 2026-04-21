@@ -3,6 +3,10 @@
     2. DYNAMIC UI,
     3. FILE HANDLING & PROCESSING */
 
+// Global variables
+let fps, videoEl, playPauseButton, videoDuration;
+let current_view = document.querySelector("#views > .btn-primary-sm").textContent.toLowerCase();
+
 /* 1. SERVER CONNECTION */
 
 // Server status
@@ -279,9 +283,18 @@ window.addEventListener("mouseup", () => {
     dragging = false;
 });
 
-track.addEventListener("click", updateFromEvent);
+track.addEventListener("click", (e) => {
+    updateFromEvent(e);
+});
 
-function updateFromEvent(e) {
+function updateFromEvent(e, progressFromVideo) {
+    if (progressFromVideo !== undefined) {
+        playhead.style.left = `${progressFromVideo}%`;
+        currentFrame = Math.round((progressFromVideo / 100) * (totalFrames + 1));
+        frameLabel.textContent = currentFrame;
+        return;
+    }
+
     const rect = track.getBoundingClientRect();
     const x = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
     const pct = x / rect.width;
@@ -317,10 +330,36 @@ function buildTicks(count) {
 // ---------- get frames ----------
 
 function onFrameChange(frameIndex) {
-    // YOU HANDLE THIS
-    // loadFrame(frameIndex)
-    // updatePreview(...)
-    if (frameIndex === previousFrame || frameIndex === undefined) return;
+    if (frameIndex === previousFrame || frameIndex === undefined || !videoEl || !fps) return;
 
-    console.log("Frame:", frameIndex);
+    const timeStamp = frameIndex / fps;
+
+    videoEl.pause();
+    if (playPauseButton) playPauseButton.dataset.playing = "false";
+
+    videoEl.currentTime = timeStamp;
+    previousFrame = frameIndex;
 }
+
+function playPauseSetup() {
+    playPauseButton = document.getElementById("playPause");
+
+    playPauseButton.addEventListener("click", () => {
+        if (videoEl.paused) {
+            videoEl.play();
+            playPauseButton.dataset.playing = "true";
+        } else {
+            videoEl.pause();
+            playPauseButton.dataset.playing = "false";
+        }
+    });
+
+    window.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+            e.preventDefault();
+            playPauseButton.click();
+        }
+    });
+}
+
+playPauseSetup();
