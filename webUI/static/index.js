@@ -4,8 +4,13 @@
     3. FILE HANDLING & PROCESSING */
 
 // Global variables
-let fps, videoEl, playPauseButton;
-let videoDuration = 0;
+let fps, videoEl, imageEl, playPauseButton;
+let videoDuration,
+    totalFrames,
+    currentFrame,
+    previousFrame = 0;
+let dragging = false;
+
 let current_view = document.querySelector("#views > .btn-primary-sm").textContent.toLowerCase();
 
 /* 1. SERVER CONNECTION */
@@ -266,11 +271,6 @@ const frameLabel = document.getElementById("frame");
 const framesTotalLabel = document.getElementById("frames-total");
 const timecodeLabel = document.getElementById("timecode");
 
-let totalFrames = 0;
-let currentFrame,
-    previousFrame = 0;
-let dragging = false;
-
 // Init track UI
 buildTicks(totalFrames);
 
@@ -295,6 +295,15 @@ track.addEventListener("click", (e) => {
 });
 
 function updateFromEvent(e, progressFromVideo, currentTimeFromVideo) {
+    if (e === undefined && current_view == "alpha") {
+        currentFrame = Math.round((progressFromVideo / 100) * totalFrames);
+        updateUI(`${progressFromVideo}%`, currentTimeFromVideo);
+
+        let frameString = currentFrame.toString().padStart(6, "0");
+        imageEl.src = `/media/${PROJECT_NAME}/clips/Input/AlphaHint/frame_${frameString}.png`;
+        return;
+    }
+
     if (progressFromVideo !== undefined) {
         currentFrame = Math.round((progressFromVideo / 100) * (totalFrames + 1));
         updateUI(`${progressFromVideo}%`, currentTimeFromVideo);

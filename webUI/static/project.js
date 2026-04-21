@@ -65,6 +65,10 @@ function update_view() {
             view_comp();
             break;
 
+        case "alpha":
+            view_alpha();
+            break;
+
         default:
             view_original();
             break;
@@ -73,11 +77,13 @@ function update_view() {
 
 function view_original() {
     previewContainer.querySelector("p").classList.add("hidden");
+    imageEl?.classList?.add("hidden");
 
     // Video preview
     if (!videoEl) {
         create_video_element(`/media/${PROJECT_NAME}/clips/Input/Source/Input.mp4`);
     } else {
+        videoEl.classList.remove("hidden");
         videoEl.src = `/media/${PROJECT_NAME}/clips/Input/Source/Input.mp4`;
     }
 
@@ -86,15 +92,32 @@ function view_original() {
 
 function view_comp() {
     previewContainer.querySelector("p").classList.add("hidden");
+    imageEl?.classList?.add("hidden");
 
     // Video preview
     if (!videoEl) {
         create_video_element(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_Comp_export.mp4`);
     } else {
+        videoEl.classList.remove("hidden");
         videoEl.src = `/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_Comp_export.mp4`;
     }
 
     if (!fps) count_frames(videoEl);
+}
+
+function view_alpha() {
+    previewContainer.querySelector("p").classList.add("hidden");
+    videoEl?.classList?.add("hidden");
+
+    let frameString = currentFrame.toString().padStart(6, "0"); // format: 000594 with 594 being the frame
+
+    // Frame preview
+    if (!imageEl) {
+        create_image_element(`/media/${PROJECT_NAME}/clips/Input/AlphaHint/frame_${frameString}.png`);
+    } else {
+        imageEl.classList.remove("hidden");
+        imageEl.src = `/media/${PROJECT_NAME}/clips/Input/AlphaHint/frame_${frameString}.png`;
+    }
 }
 
 // Helpers
@@ -134,6 +157,14 @@ function create_video_element(src) {
         if (!playPauseButton) return;
         playPauseButton.dataset.playing = "false";
     });
+}
+
+function create_image_element(src) {
+    imageEl = document.createElement("img");
+    imageEl.src = src;
+    imageEl.className = "max-h-full max-w-full rounded";
+
+    previewContainer.append(imageEl);
 }
 
 function count_frames(video) {
