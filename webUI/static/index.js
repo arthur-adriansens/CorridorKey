@@ -11,7 +11,7 @@ let videoDuration,
     previousFrame = 0;
 let dragging = false;
 
-let current_view = document.querySelector("#views > .btn-primary-sm").textContent.toLowerCase();
+let current_view = document.querySelector("#views > .btn-primary-sm").textContent;
 
 /* 1. SERVER CONNECTION */
 
@@ -163,7 +163,7 @@ toggle_group.addEventListener("click", (e) => {
     toggle_group.querySelector(".btn-primary-sm").classList.replace("btn-primary-sm", "btn-secondary-sm");
     e.target.classList.replace("btn-secondary-sm", "btn-primary-sm");
 
-    current_view = e.target.textContent.toLowerCase();
+    current_view = e.target.textContent;
     update_view();
 });
 
@@ -295,12 +295,16 @@ track.addEventListener("click", (e) => {
 });
 
 function updateFromEvent(e, progressFromVideo, currentTimeFromVideo) {
-    if (e === undefined && current_view == "alpha") {
+    if (e === undefined && (current_view == "Alpha" || current_view == "Matte")) {
         currentFrame = Math.round((progressFromVideo / 100) * totalFrames);
         updateUI(`${progressFromVideo}%`, currentTimeFromVideo);
 
         let frameString = currentFrame.toString().padStart(6, "0");
-        imageEl.src = `/media/${PROJECT_NAME}/clips/Input/AlphaHint/frame_${frameString}.png`;
+        if (current_view == "Alpha") {
+            imageEl.src = `/media/${PROJECT_NAME}/clips/Input/AlphaHint/frame_${frameString}.png`;
+        } else {
+            imageEl.src = `/media/${PROJECT_NAME}/clips/Input/Output/Matte/frame_${frameString}.png`;
+        }
         return;
     }
 

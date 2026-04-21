@@ -57,20 +57,24 @@ const previewContainer = document.getElementById("preview");
 
 function update_view() {
     switch (current_view) {
-        case "original":
+        case "Original":
             view_original();
             break;
 
-        case "comp":
+        case "COMP":
             view_comp();
             break;
 
-        case "alpha":
+        case "Alpha":
             view_alpha();
             break;
 
+        case "Matte":
+            view_matte();
+            break;
+
         default:
-            view_original();
+            view_frames();
             break;
     }
 }
@@ -105,6 +109,7 @@ function view_comp() {
     if (!fps) count_frames(videoEl);
 }
 
+// This is for the videos that are stored as frame => TODO: just convert to mp4 on server
 function view_alpha() {
     previewContainer.querySelector("p").classList.add("hidden");
     videoEl?.classList?.add("hidden");
@@ -118,6 +123,54 @@ function view_alpha() {
         imageEl.classList.remove("hidden");
         imageEl.src = `/media/${PROJECT_NAME}/clips/Input/AlphaHint/frame_${frameString}.png`;
     }
+}
+
+// This is for the videos that are stored as frame => TODO: just convert exr's to png's to mp4 on server
+function view_matte() {
+    previewContainer.querySelector("p").classList.add("hidden");
+    videoEl?.classList?.add("hidden");
+
+    let frameString = currentFrame.toString().padStart(6, "0"); // format: 000594 with 594 being the frame
+
+    // Frame preview
+    if (!imageEl) {
+        create_image_element(`/media/${PROJECT_NAME}/clips/Input/Output/Matte/frame_${frameString}.png`);
+    } else {
+        imageEl.classList.remove("hidden");
+        imageEl.src = `/media/${PROJECT_NAME}/clips/Input/Output/Matte/frame_${frameString}.png`;
+    }
+}
+
+async function view_frames() {
+    const params = new URLSearchParams({
+        project: PROJECT_NAME,
+        export_type: current_view,
+        fps,
+    });
+
+    const response = await fetch(`/api/checkOutput?${params}`);
+
+    if (!response.ok) {
+        const message = await response.json();
+        console.log("Unable to fetch output. Error:", message.detail);
+        return;
+    }
+
+    const data = await response.json();
+    console.log(data);
+
+    // Render video preview
+    previewContainer.querySelector("p").classList.add("hidden");
+    imageEl?.classList?.add("hidden");
+
+    if (!videoEl) {
+        create_video_element(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`);
+    } else {
+        videoEl.classList.remove("hidden");
+        videoEl.src = `/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`;
+    }
+
+    if (!fps) count_frames(videoEl);
 }
 
 // Helpers

@@ -316,25 +316,18 @@ def stitch_video(
     ffmpeg = find_ffmpeg()
     if not ffmpeg:
         raise RuntimeError("ffmpeg not found")
-
+    
     # Count total frames
     total_frames = len([f for f in os.listdir(in_dir) if f.lower().endswith((".png", ".jpg", ".jpeg", ".exr"))])
 
     cmd = [
         ffmpeg,
-        "-framerate",
-        str(fps),
-        "-start_number",
-        "0",
-        "-i",
-        os.path.join(in_dir, pattern),
-        "-c:v",
-        codec,
-        "-crf",
-        str(crf),
-        "-pix_fmt",
-        "yuv420p",
-        out_path,
+        "-framerate", str(fps),
+        "-start_number", "0",
+        "-i", os.path.join(in_dir, pattern),
+        "-c:v", codec,
+        "-crf", str(crf),
+        out_path,  
         "-y",
     ]
 
@@ -353,6 +346,8 @@ def stitch_video(
 
     try:
         for line in proc.stderr:
+            print(line.strip())
+            
             if cancel_event and cancel_event.is_set():
                 try:
                     proc.stdin.write("q\n")
