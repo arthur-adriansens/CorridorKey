@@ -1132,6 +1132,12 @@ li {
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
+.btn-primary:disabled {
+  pointer-events: auto;
+  cursor: not-allowed;
+  background-color: rgb(2 154 212 / 0.5);
+}
+
 .btn-primary-sm {
   border-radius: 0.25rem;
   --tw-bg-opacity: 1;
@@ -1155,6 +1161,12 @@ li {
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
+.btn-primary-sm:disabled {
+  pointer-events: auto;
+  cursor: not-allowed;
+  background-color: rgb(2 154 212 / 0.5);
+}
+
 .btn-secondary {
   border-radius: 0.25rem;
   --tw-bg-opacity: 1;
@@ -1173,6 +1185,15 @@ li {
 .btn-secondary:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
+}
+
+.btn-secondary:disabled {
+  pointer-events: auto;
+  cursor: not-allowed;
+  --tw-bg-opacity: 1;
+  background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
+  --tw-text-opacity: 1;
+  color: rgb(161 161 170 / var(--tw-text-opacity, 1));
 }
 
 .btn-secondary-sm {
@@ -1200,6 +1221,15 @@ li {
   background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
 }
 
+.btn-secondary-sm:disabled {
+  pointer-events: auto;
+  cursor: not-allowed;
+  --tw-bg-opacity: 1;
+  background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
+  --tw-text-opacity: 1;
+  color: rgb(161 161 170 / var(--tw-text-opacity, 1));
+}
+
 .btn-outline {
   border-radius: 0.25rem;
   border-width: 1px;
@@ -1221,6 +1251,15 @@ li {
 .btn-outline:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
+}
+
+.btn-outline:disabled {
+  pointer-events: auto;
+  cursor: not-allowed;
+  --tw-bg-opacity: 1;
+  background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
+  --tw-text-opacity: 1;
+  color: rgb(161 161 170 / var(--tw-text-opacity, 1));
 }
 
 /* Scrollbar styling from corridordigital.com */
