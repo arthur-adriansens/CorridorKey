@@ -39,30 +39,23 @@ def gpus():
     return [asdict(gpu) for gpu in gpus]
  
 @app.get("/api/projectInfo")
-def project_info(project: str, path: str):
-    # get project path
+def project_info(project: str):
+    # get project (names)
     projects = [p.name for p in PROJECT_ROOT.iterdir() if p.is_dir()]
-    
-    # with open("data.json", "r") as f:
-    #     json.dump(data, f)
 
-    # get original video fps
-    file_path = (PROJECT_ROOT / path).resolve()
-    print("path", file_path)
-    
-    fps = 0
-    if find_ffmpeg():
-        try:
-            video_info = probe_video(file_path)
-            fps = video_info.get("fps", 24.0)
-        except:
-            print("Error probing video, using default fps of 24.0")
+    # get video metadata of current project
+    metadata_path = (PROJECT_ROOT / project / "clips/Input/.video_metadata.json")
+
+    if (PROJECT_ROOT / project).is_dir() and metadata_path.is_file():
+        with open(metadata_path, "r") as file:
+            data = json.load(file)
+            fps = data.get("fps")
+            frames = data.get("frame_count")
+            duration = data.get("duration") or (frames / fps)
     else:
-        print("ffmpeg not found, using default fps of 24.0")
+        raise HTTPException(status_code=404, detail="Project not found.")
 
-    # clips = clip_manager.scan_clips()
-
-    return {"fps": fps, "projects": projects}
+    return {"fps": fps, "frame_count": frames, "duration": duration, "projects": projects}
 
 # -------------------
 # Media files

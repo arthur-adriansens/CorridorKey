@@ -13,19 +13,22 @@ projectInfo();
 
 async function projectInfo() {
     const params = new URLSearchParams({
-        project: "cool project name",
-        path: `${PROJECT_NAME}/clips/Input/Source/Input.mp4`,
+        project: PROJECT_NAME,
     });
 
     const response = await fetch(`/api/projectInfo?${params}`);
 
     if (!response.ok) {
-        console.log("Unable to fetch project.");
+        const message = await response.json();
+        console.log("Unable to fetch project. Error:", message.detail);
         return;
     }
 
     const info = await response.json();
     console.log(info);
+
+    videoDuration = info.duration;
+    totalFrames = info.frame_count;
 
     // Update fps UI
     fps = info.fps;
@@ -110,7 +113,7 @@ function create_video_element(src) {
             // console.log(now, metadata);
             const currentTime = metadata.mediaTime;
             const progress = (currentTime / videoDuration) * 100;
-            updateFromEvent(undefined, progress);
+            updateFromEvent(undefined, progress, currentTime);
         }
 
         // Re-register the callback to be notified about the next frame.
@@ -120,12 +123,10 @@ function create_video_element(src) {
     videoEl.requestVideoFrameCallback(doSomethingWithTheFrame);
 
     videoEl.addEventListener("loadedmetadata", () => {
-        videoDuration = videoEl.duration;
-        const estimatedFrames = Math.round(fps * videoDuration);
+        if (videoDuration == 0) videoDuration = videoEl.duration;
+        if (totalFrames == 0) totalFrames = Math.round(fps * videoDuration);
 
-        totalFrames = Math.round(fps * videoDuration);
         document.getElementById("frames-total").textContent = totalFrames;
-
         buildTicks(totalFrames);
     });
 

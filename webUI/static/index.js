@@ -4,7 +4,8 @@
     3. FILE HANDLING & PROCESSING */
 
 // Global variables
-let fps, videoEl, playPauseButton, videoDuration;
+let fps, videoEl, playPauseButton;
+let videoDuration = 0;
 let current_view = document.querySelector("#views > .btn-primary-sm").textContent.toLowerCase();
 
 /* 1. SERVER CONNECTION */
@@ -263,8 +264,9 @@ const playhead = document.getElementById("playhead");
 
 const frameLabel = document.getElementById("frame");
 const framesTotalLabel = document.getElementById("frames-total");
+const timecodeLabel = document.getElementById("timecode");
 
-let totalFrames = 150;
+let totalFrames = 0;
 let currentFrame,
     previousFrame = 0;
 let dragging = false;
@@ -292,11 +294,10 @@ track.addEventListener("click", (e) => {
     updateFromEvent(e);
 });
 
-function updateFromEvent(e, progressFromVideo) {
+function updateFromEvent(e, progressFromVideo, currentTimeFromVideo) {
     if (progressFromVideo !== undefined) {
-        playhead.style.left = `${progressFromVideo}%`;
         currentFrame = Math.round((progressFromVideo / 100) * (totalFrames + 1));
-        frameLabel.textContent = currentFrame;
+        updateUI(`${progressFromVideo}%`, currentTimeFromVideo);
         return;
     }
 
@@ -306,7 +307,7 @@ function updateFromEvent(e, progressFromVideo) {
 
     currentFrame = Math.round(totalFrames * pct);
 
-    updateUI();
+    updateUI(`${(currentFrame / (totalFrames + 1)) * 100}%`, currentFrame / fps);
     onFrameChange(currentFrame);
 
     previousFrame = currentFrame;
@@ -314,9 +315,10 @@ function updateFromEvent(e, progressFromVideo) {
 
 // ---------- UI updates ----------
 
-function updateUI() {
+function updateUI(percentage, currentTime) {
     frameLabel.textContent = currentFrame;
-    playhead.style.left = `${(currentFrame / (totalFrames + 1)) * 100}%`;
+    playhead.style.left = percentage;
+    timecode.textContent = new Date(currentTime * 1000).toISOString().substr(11, 12);
 }
 
 // ---------- ticks ----------
@@ -363,6 +365,21 @@ function playPauseSetup() {
         if (e.code === "Space") {
             e.preventDefault();
             playPauseButton.click();
+            return;
+        }
+
+        if (e.code === "ArrowRight") {
+            e.preventDefault();
+            currentFrame = Math.min(currentFrame + 1, totalFrames);
+            videoEl.currentTime = currentFrame / fps;
+            return;
+        }
+
+        if (e.code === "ArrowLeft") {
+            e.preventDefault();
+            currentFrame = Math.max(currentFrame - 1, 0);
+            videoEl.currentTime = currentFrame / fps;
+            return;
         }
     });
 }
