@@ -595,6 +595,10 @@ video {
   margin-right: auto;
 }
 
+.\!mt-0 {
+  margin-top: 0px !important;
+}
+
 .\!mt-4 {
   margin-top: 1rem !important;
 }
@@ -613,14 +617,6 @@ video {
 
 .mt-1 {
   margin-top: 0.25rem;
-}
-
-.mt-0 {
-  margin-top: 0px;
-}
-
-.\!mt-0 {
-  margin-top: 0px !important;
 }
 
 .block {
@@ -1300,6 +1296,33 @@ fieldset[collapsable][closed] {
 fieldset[collapsable][closed]>:not(legend) {
   pointer-events: none;
   opacity: 0;
+}
+
+/* Projects list */
+
+ul#projects-list>li:not(.selected) {
+  border-radius: 0.25rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+ul#projects-list>li:not(.selected):hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
+}
+
+ul#projects-list>li.selected {
+  border-radius: 0.25rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(2 154 212 / var(--tw-bg-opacity, 1));
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity, 1));
 }
 
 .hover\:bg-\[\#1f293\]:hover {

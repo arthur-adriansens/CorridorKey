@@ -13,13 +13,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../..")))
 
 # Import corridorKey logic
 import device_utils
-import clip_manager
+# import clip_manager
 
 # Project root
 ROOT = Path(__file__).resolve().parent.parent 
-MEDIA_ROOT = Path("C:/Users/arthu/AppData/Roaming/EZ-CorridorKey").resolve()
+PROJECT_ROOT = Path(__file__).resolve().parent.parent / "projects"
 
-print(ROOT)
+print(PROJECT_ROOT)
 
 app = FastAPI() 
 
@@ -37,18 +37,19 @@ def health():
 def gpus():
     gpus = device_utils.enumerate_gpus()
     return [asdict(gpu) for gpu in gpus]
-
-
+ 
 @app.get("/api/projectInfo")
 def project_info(project: str, path: str):
     # get project path
-    # with open("data.json", "w") as f:
+    projects = [p.name for p in PROJECT_ROOT.iterdir() if p.is_dir()]
+    
+    # with open("data.json", "r") as f:
     #     json.dump(data, f)
 
-    file_path = (MEDIA_ROOT / path).resolve()
+    # get original video fps
+    file_path = (PROJECT_ROOT / path).resolve()
     print("path", file_path)
     
-    # get original video fps
     fps = 0
     if find_ffmpeg():
         try:
@@ -61,7 +62,7 @@ def project_info(project: str, path: str):
 
     # clips = clip_manager.scan_clips()
 
-    return {"fps": fps}
+    return {"fps": fps, "projects": projects}
 
 # -------------------
 # Media files
@@ -69,10 +70,10 @@ def project_info(project: str, path: str):
 
 @app.get("/media/{path:path}")
 def media_file(path: str):
-    file_path = (MEDIA_ROOT / path).resolve()
+    file_path = (PROJECT_ROOT / path).resolve()
 
-    # Security check: prevent escaping MEDIA_ROOT
-    if not file_path.is_file() or MEDIA_ROOT not in file_path.parents:
+    # Security check: prevent escaping PROJECT_ROOT
+    if not file_path.is_file() or PROJECT_ROOT not in file_path.parents:
         raise HTTPException(status_code=404)
 
     return FileResponse(file_path)

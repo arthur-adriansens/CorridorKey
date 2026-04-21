@@ -4,8 +4,8 @@
 
 /* 1. PROJECT SETUP */
 
-// const PROJECT_BASE_URL = "C:/Users/arthu/AppData/Roaming/EZ-CorridorKey/Projects/260415_191034_Input";
-const PROJECT_BASE_URL = "Projects/260415_191034_Input";
+// const PROJECT_NAME = "C:/Users/arthu/AppData/Roaming/EZ-CorridorKey/Projects/260415_191034_Input";
+const PROJECT_NAME = "260415_191034_Input";
 
 projectInfo();
 
@@ -14,7 +14,7 @@ projectInfo();
 async function projectInfo() {
     const params = new URLSearchParams({
         project: "cool project name",
-        path: `${PROJECT_BASE_URL}/clips/Input/Source/Input.mp4`,
+        path: `${PROJECT_NAME}/clips/Input/Source/Input.mp4`,
     });
 
     const response = await fetch(`/api/projectInfo?${params}`);
@@ -27,8 +27,23 @@ async function projectInfo() {
     const info = await response.json();
     console.log(info);
 
+    // Update fps UI
     fps = info.fps;
     document.getElementById("fps").textContent = fps;
+
+    // Update projects list UI
+    if (info?.projects?.length > 0) {
+        const projectsList = document.getElementById("projects-list");
+        projectsList.innerHTML = "";
+
+        info.projects.forEach((project) => {
+            const li = document.createElement("li");
+            li.textContent = project;
+            if (project === PROJECT_NAME) li.classList.add("selected");
+
+            projectsList.append(li);
+        });
+    }
 
     update_view();
 }
@@ -43,6 +58,10 @@ function update_view() {
             view_original();
             break;
 
+        case "comp":
+            view_comp();
+            break;
+
         default:
             view_original();
             break;
@@ -53,11 +72,35 @@ function view_original() {
     previewContainer.querySelector("p").classList.add("hidden");
 
     // Video preview
-    videoEl = document.createElement("video");
+    if (!videoEl) {
+        create_video_element(`/media/${PROJECT_NAME}/clips/Input/Source/Input.mp4`);
+    } else {
+        videoEl.src = `/media/${PROJECT_NAME}/clips/Input/Source/Input.mp4`;
+    }
 
-    videoEl.src = `/media/${PROJECT_BASE_URL}/clips/Input/Source/Input.mp4`;
+    if (!fps) count_frames(videoEl);
+}
+
+function view_comp() {
+    previewContainer.querySelector("p").classList.add("hidden");
+
+    // Video preview
+    if (!videoEl) {
+        create_video_element(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_Comp_export.mp4`);
+    } else {
+        videoEl.src = `/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_Comp_export.mp4`;
+    }
+
+    if (!fps) count_frames(videoEl);
+}
+
+// Helpers
+
+function create_video_element(src) {
+    videoEl = document.createElement("video");
+    videoEl.src = src;
     videoEl.preload = "metadata";
-    // videoEl.controls = true;
+    videoEl.controls = false;
     videoEl.className = "max-h-full max-w-full rounded";
 
     previewContainer.append(videoEl);
@@ -76,10 +119,6 @@ function view_original() {
 
     videoEl.requestVideoFrameCallback(doSomethingWithTheFrame);
 
-    if (!fps) {
-        count_frames(videoEl);
-    }
-
     videoEl.addEventListener("loadedmetadata", () => {
         videoDuration = videoEl.duration;
         const estimatedFrames = Math.round(fps * videoDuration);
@@ -95,8 +134,6 @@ function view_original() {
         playPauseButton.dataset.playing = "false";
     });
 }
-
-// Helpers
 
 function count_frames(video) {
     let frameCount = 0;

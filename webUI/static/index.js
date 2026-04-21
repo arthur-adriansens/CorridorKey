@@ -148,6 +148,7 @@ document.addEventListener("mousemove", (e) => {
 });
 
 // Toggle group (only select one button)
+
 const toggle_group = document.querySelector("div[toggle-group]");
 
 toggle_group.addEventListener("click", (e) => {
@@ -155,9 +156,13 @@ toggle_group.addEventListener("click", (e) => {
 
     toggle_group.querySelector(".btn-primary-sm").classList.replace("btn-primary-sm", "btn-secondary-sm");
     e.target.classList.replace("btn-secondary-sm", "btn-primary-sm");
+
+    current_view = e.target.textContent.toLowerCase();
+    update_view();
 });
 
 // Collapsable fieldsets
+
 const collapsables_triggers = document.querySelectorAll("fieldset[collapsable]>legend");
 
 collapsables_triggers.forEach((trigger) =>
