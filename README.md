@@ -7,7 +7,6 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
 
 ### Prerequisites
 
-- Python 3.10 or newer
 - NPM to install Tailwind for development
 
 ### Install
@@ -60,14 +59,14 @@ cd webUI
 tailwindcss -i static/input.css -o static/styles.css --watch
 ```
 
-That's it.
+That's it!
 
 ## Questions?
 
 DM [Art on Discord](https://discord.com/users/714418367209144330).
 Join the [Discord](https://discord.gg/zvwUrdWXJm) — it's the fastest way to get help or discuss ideas before opening a PR.
 
-# Original repo README:
+# Parts of original repo README:
 
 ## Getting Started
 
