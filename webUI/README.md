@@ -1,52 +1,76 @@
 # CorridorKey web UI
 
-Hi! This web UI was made by Arthur Adriansens. I stepped out of my comfort zone (JavaScripe, Node.js and Astro) to use Python. This UI version doens't use any pip python libraries, only native.
+Hi! This web UI was made by Arthur Adriansens. I stepped out of my comfort zone from JavaScript, Node.js, and Astro to use Python. This UI version does not use any pip Python libraries, only the standard library.
+
 I wanted to avoid adding any packages to this awesome project, so I only used devDependencies, because I want to use Tailwind CSS for faster development and maintainability.
 
 ## Developer notes
 
 ### Prerequisites
-
-- Python 3.10 or newer
-- NPM to install Tailwind for development
+- Python 3.10 or newer: [Python downloads](https://www.python.org/downloads/)
+- Node.js and npm for Tailwind development: [Node.js](https://nodejs.org/en)
 
 ### Install
 
-To clone this intire project:
+To clone the entire project:
 
 ```bash
 git clone https://github.com/nikopueringer/CorridorKey.git
 cd CorridorKey
-uv sync --group dev    # installs all dependencies + dev tools (pytest, ruff)
-
-uv run uvicorn webUI.server.server:app --reload # start the python server (also for development)
 ```
 
-Ffmpeg also needs to be installed:
+Install the Python development dependencies:
 
 ```bash
-winget install "FFmpeg (Essentials Build)"    # Windows
-brew install ffmpeg     # macOS
-sudo apt update && sudo apt install -y ffmpeg   # Ubuntu / Debian
+uv sync --group dev
+```
 
-# or: https://ffmpeg.org/download.html
+Start the Python server:
 
+```bash
+uv run uvicorn webUI.server.server:app --reload
+```
+
+## FFmpeg
+
+FFmpeg also needs to be installed.
+
+Download FFmpeg here: [ffmpeg.org/download.html](https://ffmpeg.org/download.html)
+
+### Windows
+```bash
+winget install "FFmpeg (Essentials Build)"
+```
+
+### macOS
+```bash
+brew install ffmpeg
+```
+
+### Ubuntu / Debian
+```bash
+sudo apt update && sudo apt install -y ffmpeg
+```
+
+Verify the installation:
+
+```bash
 ffmpeg -version
 ```
 
 ## Dev setup
 
-To install tailwindCSS globally and enable tailwind watching to generate the ouput.css file
+Install Tailwind CSS globally and run watch mode to generate `output.css`:
 
 ```bash
 npm install -g tailwindcss@3 # v4 doesn't really work without a package.json
-
-cd webUI && tailwindcss -i static/input.css -o static/styles.css --watch    # run this in a second terminal during development
+cd webUI && tailwindcss -i static/input.css -o static/styles.css --watch # run this in a second terminal during development
 ```
 
-That's it.
+That’s it.
 
 ## Questions?
+
 
 DM [Art on Discord](https://discord.com/users/714418367209144330).
 Join the [Discord](https://discord.gg/zvwUrdWXJm) — it's the fastest way to get help or discuss ideas before opening a PR.
