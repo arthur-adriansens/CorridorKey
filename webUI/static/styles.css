@@ -590,6 +590,14 @@ video {
   top: 0px;
 }
 
+.z-10 {
+  z-index: 10;
+}
+
+.col-span-2 {
+  grid-column: span 2 / span 2;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -611,8 +619,16 @@ video {
   margin-bottom: 1rem;
 }
 
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
 .ml-auto {
   margin-left: auto;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
 }
 
 .mt-1 {
@@ -652,6 +668,10 @@ video {
   height: 2rem;
 }
 
+.h-9 {
+  height: 2.25rem;
+}
+
 .h-\[12px\] {
   height: 12px;
 }
@@ -678,6 +698,10 @@ video {
 
 .w-0\.5 {
   width: 0.125rem;
+}
+
+.w-16 {
+  width: 4rem;
 }
 
 .w-20 {
@@ -720,6 +744,10 @@ video {
 
 .grid-cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-rows-2 {
+  grid-template-rows: repeat(2, minmax(0, 1fr));
 }
 
 .flex-col {
@@ -900,6 +928,11 @@ video {
 .object-contain {
   -o-object-fit: contain;
      object-fit: contain;
+}
+
+.object-cover {
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 
 .p-2 {
@@ -1364,6 +1397,23 @@ ul#projects-list>li.selected {
   color: rgb(0 0 0 / var(--tw-text-opacity, 1));
 }
 
+/* Exports list */
+
+ul#exports-list>li {
+  display: flex;
+  border-radius: 0.25rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  vertical-align: middle;
+}
+
+ul#exports-list>li:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
+}
+
 .hover\:bg-\[\#1f293\]:hover {
   background-color: #1f293;
 }
@@ -1396,6 +1446,10 @@ ul#projects-list>li.selected {
 
 .group[data-playing="true"] .group-data-\[playing\=true\]\:hidden {
   display: none;
+}
+
+.\[\&\>\*\]\:hover\:cursor-pointer:hover>* {
+  cursor: pointer;
 }
 
 .\[\&\>svg\]\:size-5>svg {

@@ -48,12 +48,41 @@ async function projectInfo() {
         });
     }
 
+    // Update BiRefNet options UI
+    if (info?.birefnet_options?.length > 0) {
+        const birefnetSelect = document.getElementById("birefnet-options");
+        birefnetSelect.innerHTML = "";
+
+        info.birefnet_options.forEach((option) => {
+            const opt = document.createElement("option");
+            opt.textContent = option;
+            birefnetSelect.append(opt);
+        });
+    }
+
     update_view();
+
+    // Update exports list UI
+    if (info?.exports) {
+        const exportsList = document.getElementById("exports-list");
+        exportsList.innerHTML = "";
+
+        Object.entries(info.exports).forEach(([videoName, videoPath]) => {
+            const li = document.createElement("li");
+            const img = get_thumbnail(videoName);
+
+            li.textContent = videoName;
+            li.onclick = click_thumbnail;
+            exportsList.append(li);
+            li.prepend(img);
+        });
+    }
 }
 
 // View modes togglers
 
 const previewContainer = document.getElementById("preview");
+const view_types = Array.from(document.querySelectorAll("#views button:not([disabled])")).map((child) => child.textContent);
 
 function update_view() {
     switch (current_view) {
@@ -157,7 +186,6 @@ async function view_frames() {
     }
 
     const data = await response.json();
-    console.log(data);
 
     // Render video preview
     previewContainer.querySelector("p").classList.add("hidden");
@@ -242,4 +270,29 @@ function count_frames(video) {
         totalFrames = frameCount;
         buildTicks(totalFrames);
     });
+}
+
+function get_thumbnail(videoFileName) {
+    const thumbnailEl = document.createElement("img");
+    thumbnailEl.src = `/thumbnail/${PROJECT_NAME}/${videoFileName}`;
+    thumbnailEl.className = "w-16 h-9 object-cover rounded mr-2";
+    return thumbnailEl;
+}
+
+function click_thumbnail(event) {
+    if (!event?.target) return;
+    const views = document.querySelector("#views").children;
+
+    for (const view_button of views) {
+        const view_type = view_button.textContent;
+
+        if (event.target.textContent.includes(view_type)) {
+            current_view = view_type;
+            toggle_group.querySelector(".btn-primary-sm").classList.replace("btn-primary-sm", "btn-secondary-sm");
+            view_button.classList.replace("btn-secondary-sm", "btn-primary-sm");
+
+            update_view();
+            return;
+        }
+    }
 }

@@ -34,9 +34,17 @@
                 <div>
                     <h2 class="text-xs uppercase text-zinc-400 mb-2">Queue</h2>
                     <ul class="space-y-1">
-                        <li class="px-2 py-1 rounded bg-corridor-blue text-black">greenscreen_take_01.mp4</li>
+                        <li class="px-2 py-1 rounded hover:bg-zinc-800">empty</li>
+                        <!-- <li class="px-2 py-1 rounded bg-corridor-blue text-black">greenscreen_take_01.mp4</li>
                         <li class="px-2 py-1 rounded hover:bg-zinc-800">greenscreen_take_02.mp4</li>
-                        <li class="px-2 py-1 rounded hover:bg-zinc-800">pickup_shot.mov</li>
+                        <li class="px-2 py-1 rounded hover:bg-zinc-800">pickup_shot.mov</li> -->
+                    </ul>
+                </div>
+
+                <div>
+                    <h2 class="text-xs uppercase text-zinc-400 mb-2">Exports</h2>
+                    <ul class="space-y-1 overflow-x-auto" id="exports-list">
+                        <li>no exports</li>
                     </ul>
                 </div>
 
@@ -58,7 +66,7 @@
                     <button class="btn-secondary-sm" disabled>Mask</button>
                     <button class="btn-secondary-sm">FG</button>
                     <button class="btn-secondary-sm">Matte</button>
-                    <button class="btn-secondary-sm">COMP</button>
+                    <button class="btn-secondary-sm">Comp</button>
                     <button class="btn-secondary-sm">Processed</button>
                 </div>
 
@@ -131,7 +139,10 @@
                 <form class="h-full space-y-8">
                     <fieldset class="flex flex-col gap-5 border-b pb-8" collapsable>
                         <legend>
-                            Alpha Generation
+                            <p class="z-10 [&>*]:hover:cursor-pointer">
+                                <input type="checkbox" id="checked" />
+                                <label for="checked" class="ml-2">Alpha Generation</label>
+                            </p>
                             <span></span>
                         </legend>
 
@@ -139,10 +150,14 @@
                         <div class="space-y-2">
                             <div class="text-zinc-400 text-sm">Automatic</div>
 
-                            <div class="grid grid-cols-2 gap-2">
-                                <button class="btn-primary" title="Fast automatic alpha using GVM">GVM Auto</button>
+                            <div class="grid grid-cols-2 grid-rows-2 gap-2">
+                                <button class="btn-primary col-span-2" title="Fast automatic alpha using GVM">GVM Auto</button>
 
                                 <button class="btn-secondary" title="Deep learning based alpha estimation">BiRefNet</button>
+
+                                <select id="birefnet-options" class="btn-secondary px-2">
+                                    <option>Options</option>
+                                </select>
                             </div>
                         </div>
 
@@ -164,16 +179,11 @@
                             <p class="text-xs text-zinc-500">Requires paintstrokes on frame one.</p>
                         </div>
 
-                        <!-- Tracking -->
-                        <div class="space-y-2 pb-4 border-b">
-                            <div class="text-zinc-400 text-sm">Tracking</div>
-
-                            <button class="w-full btn-secondary" title="Paint mask on first frame and track over time">Track Mask</button>
-                        </div>
-
                         <!-- External -->
                         <div class="space-y-2">
-                            <button class="w-full btn-outline">Import Alpha</button>
+                            <div class="text-zinc-400 text-sm">Existing</div>
+
+                            <button class="w-full btn-outline" title="Import existing alpha channel">Import Alpha</button>
                         </div>
                     </fieldset>
 

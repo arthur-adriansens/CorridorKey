@@ -1,7 +1,7 @@
 
-from backend.ffmpeg_tools import probe_video, find_ffmpeg, stitch_video
-from fastapi.responses import JSONResponse, FileResponse
-from fastapi import FastAPI, Request, HTTPException
+from backend.ffmpeg_tools import find_ffmpeg, stitch_video
+from fastapi.responses import FileResponse
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.staticfiles import StaticFiles
 from dataclasses import asdict
 from pathlib import Path
@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../..")))
 
 # Import corridorKey logic
 import device_utils
-# import clip_manager
+import clip_manager
 
 # Project root
 ROOT = Path(__file__).resolve().parent.parent 
@@ -43,7 +43,7 @@ def gpus():
  
 @app.get("/api/projectInfo")
 def project_info(project: str):
-    # get project (names)
+    # get projects (names)
     projects = [p.name for p in PROJECT_ROOT.iterdir() if p.is_dir()]
 
     # get video metadata of current project
@@ -58,7 +58,15 @@ def project_info(project: str):
     else:
         raise HTTPException(status_code=404, detail="Project not found.")
 
-    return {"fps": fps, "frame_count": frames, "duration": duration, "projects": projects}
+    # get BiRefNet availble options
+    birefnet_options = clip_manager.get_birefnet_usage_options()
+
+    # get exports
+    exports_path = (PROJECT_ROOT / project / "clips/Input/_EXPORTS")
+    if exports_path.is_dir():
+        exports = {export.name: export for export in exports_path.iterdir() if export.is_file()}
+
+    return {"fps": fps, "frame_count": frames, "duration": duration, "projects": projects, "exports": exports, "birefnet_options": birefnet_options}
 
 @app.get("/api/checkOutput")
 def check_export(project: str, export_type: str, fps: int):
@@ -103,6 +111,19 @@ def media_file(path: str):
 
     return FileResponse(file_path)
 
+@app.get("/thumbnail/{project:str}/{path:path}")
+def get_thumbnail(project:str, path: str):
+    export_folder = (PROJECT_ROOT / project / "clips/Input/_EXPORTS")
+    file_path = (export_folder / path).resolve()
+
+    # Security check: prevent escaping PROJECT_ROOT
+    if not file_path.is_file() or PROJECT_ROOT not in file_path.parents:
+        raise HTTPException(status_code=404, detail="File not found.")
+
+    thumbnail_bytes = get_video_thumbnail(str(file_path))
+
+    return Response(content=thumbnail_bytes, media_type="image/png")
+
 # -------------------
 # Static files
 # -------------------
@@ -137,4 +158,29 @@ def convert_exr_to_png(frames_folder_path: Path):
 
     return "success"
 
-
+def get_video_thumbnail(video_path: str, output_size: tuple = (320, 180)) -> bytes:
+    print(video_path)
+    try:
+        video = cv2.VideoCapture(video_path)
+        
+        if not video.isOpened():
+            raise ValueError(f"Could not open video: {video_path}")
+        
+        # Read the first frame
+        ret, frame = video.read()
+        video.release()
+        
+        if not ret:
+            raise ValueError("Could not read frame from video")
+        
+        # Resize to thumbnail size & Encode to PNG
+        thumbnail = cv2.resize(frame, output_size)
+        success, encoded_image = cv2.imencode('.png', thumbnail)
+        
+        if not success:
+            raise ValueError("Could not encode thumbnail")
+        
+        return encoded_image.tobytes() # png format
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating thumbnail: {str(e)}")

@@ -54,7 +54,7 @@ async function update_gpu_status() {
         const gpus = await response.json();
 
         if (gpus.length === 0) {
-            gpu_info.textContent = "No GPU found";
+            gpu_info.textContent = "No active GPU found";
             return;
         }
 

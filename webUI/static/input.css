@@ -149,3 +149,8 @@ ul#projects-list>li:not(.selected) {
 ul#projects-list>li.selected {
     @apply px-2 py-1 rounded bg-corridor-blue text-black;
 }
+
+/* Exports list */
+ul#exports-list>li {
+    @apply px-2 py-1 rounded hover:bg-zinc-800 flex align-middle;
+}
