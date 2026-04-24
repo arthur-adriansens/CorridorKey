@@ -141,16 +141,16 @@ fieldset[collapsable][closed]>:not(legend) {
     @apply opacity-0 pointer-events-none;
 }
 
-/* Projects list */
-ul#projects-list>li:not(.selected) {
+/* Projects and Exports list */
+ul#projects-list>li:not(.selected),
+ul#exports-list>li:not(.selected) {
     @apply px-2 py-1 rounded hover:bg-zinc-800;
 }
 
-ul#projects-list>li.selected {
-    @apply px-2 py-1 rounded bg-corridor-blue text-black;
+ul#exports-list>li {
+    @apply flex gap-2 select-none shrink-0 w-max;
 }
 
-/* Exports list */
-ul#exports-list>li {
-    @apply px-2 py-1 rounded hover:bg-zinc-800 flex align-middle;
+li.selected {
+    @apply px-2 py-1 rounded bg-corridor-blue text-black bg-clip-padding;
 }

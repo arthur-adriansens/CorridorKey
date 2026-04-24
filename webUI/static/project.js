@@ -292,6 +292,12 @@ function click_thumbnail(event) {
             view_button.classList.replace("btn-secondary-sm", "btn-primary-sm");
 
             update_view();
+
+            const previouslySelected = document.querySelector("#exports-list li.selected");
+            if (previouslySelected !== event.target) {
+                previouslySelected?.classList.remove("selected");
+            }
+            event.target.classList.toggle("selected");
             return;
         }
     }
