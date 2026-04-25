@@ -4,12 +4,11 @@
 
 /* 1. PROJECT SETUP */
 
-// const PROJECT_NAME = "C:/Users/arthu/AppData/Roaming/EZ-CorridorKey/Projects/260415_191034_Input";
-const PROJECT_NAME = "260415_191034_Input";
-
 projectInfo();
 
 // Setup
+
+let projectData = {};
 
 async function projectInfo() {
     const params = new URLSearchParams({
@@ -24,22 +23,22 @@ async function projectInfo() {
         return;
     }
 
-    const info = await response.json();
-    console.log(info);
+    projectData = await response.json();
+    console.log(projectData);
 
-    videoDuration = info.duration;
-    totalFrames = info.frame_count;
+    videoDuration = projectData.duration;
+    totalFrames = projectData.frame_count;
 
     // Update fps UI
-    fps = info.fps;
+    fps = projectData.fps;
     document.getElementById("fps").textContent = fps;
 
     // Update projects list UI
-    if (info?.projects?.length > 0) {
+    if (projectData?.projects?.length > 0) {
         const projectsList = document.getElementById("projects-list");
         projectsList.innerHTML = "";
 
-        info.projects.forEach((project) => {
+        projectData.projects.forEach((project) => {
             const li = document.createElement("li");
             li.textContent = project;
             if (project === PROJECT_NAME) li.classList.add("selected");
@@ -49,11 +48,11 @@ async function projectInfo() {
     }
 
     // Update BiRefNet options UI
-    if (info?.birefnet_options?.length > 0) {
+    if (projectData?.birefnet_options?.length > 0) {
         const birefnetSelect = document.getElementById("birefnet-options");
         birefnetSelect.innerHTML = "";
 
-        info.birefnet_options.forEach((option) => {
+        projectData.birefnet_options.forEach((option) => {
             const opt = document.createElement("option");
             opt.textContent = option;
             birefnetSelect.append(opt);
@@ -63,20 +62,26 @@ async function projectInfo() {
     update_view();
 
     // Update exports list UI
-    if (info?.exports) {
-        const exportsList = document.getElementById("exports-list");
-        exportsList.innerHTML = "";
-
-        Object.entries(info.exports).forEach(([videoName, videoPath]) => {
-            const li = document.createElement("li");
-            const img = get_thumbnail(videoName);
-
-            li.textContent = videoName;
-            li.onclick = click_thumbnail;
-            exportsList.append(li);
-            li.prepend(img);
-        });
+    if (projectData?.exports) {
+        update_exports_list();
     }
+}
+
+const exportsList = document.getElementById("exports-list");
+function update_exports_list() {
+    generation_progress?.classList?.add("hidden");
+    previewContainer.classList.remove("hidden");
+    exportsList.innerHTML = "";
+
+    Object.entries(projectData.exports).forEach(([videoName, videoPath]) => {
+        const li = document.createElement("li");
+        const img = get_thumbnail(videoName);
+
+        li.textContent = videoName;
+        exportsList.append(li);
+        li.prepend(img);
+        li.onclick = click_thumbnail;
+    });
 }
 
 // View modes togglers
@@ -85,21 +90,24 @@ const previewContainer = document.getElementById("preview");
 const view_types = Array.from(document.querySelectorAll("#views button:not([disabled])")).map((child) => child.textContent);
 
 function update_view() {
+    generation_progress?.classList?.add("hidden");
+    previewContainer.classList.remove("hidden");
+
+    previewContainer.querySelector("p").classList.add("hidden");
+
     switch (current_view) {
         case "Original":
-            view_original();
+            video_viewer(`/media/${PROJECT_NAME}/clips/Input/Source/Input.mp4`);
             break;
 
         case "COMP":
             view_comp();
+            video_viewer(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_Comp_export.mp4`);
             break;
 
         case "Alpha":
-            view_alpha();
-            break;
-
-        case "Matte":
-            view_matte();
+            // view_alpha();
+            view_frames(true);
             break;
 
         default:
@@ -108,31 +116,15 @@ function update_view() {
     }
 }
 
-function view_original() {
-    previewContainer.querySelector("p").classList.add("hidden");
+function video_viewer(path) {
     imageEl?.classList?.add("hidden");
 
     // Video preview
     if (!videoEl) {
-        create_video_element(`/media/${PROJECT_NAME}/clips/Input/Source/Input.mp4`);
+        create_video_element(path);
     } else {
         videoEl.classList.remove("hidden");
-        videoEl.src = `/media/${PROJECT_NAME}/clips/Input/Source/Input.mp4`;
-    }
-
-    if (!fps) count_frames(videoEl);
-}
-
-function view_comp() {
-    previewContainer.querySelector("p").classList.add("hidden");
-    imageEl?.classList?.add("hidden");
-
-    // Video preview
-    if (!videoEl) {
-        create_video_element(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_Comp_export.mp4`);
-    } else {
-        videoEl.classList.remove("hidden");
-        videoEl.src = `/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_Comp_export.mp4`;
+        videoEl.src = path;
     }
 
     if (!fps) count_frames(videoEl);
@@ -140,7 +132,6 @@ function view_comp() {
 
 // This is for the videos that are stored as frame => TODO: just convert to mp4 on server
 function view_alpha() {
-    previewContainer.querySelector("p").classList.add("hidden");
     videoEl?.classList?.add("hidden");
 
     let frameString = currentFrame.toString().padStart(6, "0"); // format: 000594 with 594 being the frame
@@ -154,23 +145,7 @@ function view_alpha() {
     }
 }
 
-// This is for the videos that are stored as frame => TODO: just convert exr's to png's to mp4 on server
-function view_matte() {
-    previewContainer.querySelector("p").classList.add("hidden");
-    videoEl?.classList?.add("hidden");
-
-    let frameString = currentFrame.toString().padStart(6, "0"); // format: 000594 with 594 being the frame
-
-    // Frame preview
-    if (!imageEl) {
-        create_image_element(`/media/${PROJECT_NAME}/clips/Input/Output/Matte/frame_${frameString}.png`);
-    } else {
-        imageEl.classList.remove("hidden");
-        imageEl.src = `/media/${PROJECT_NAME}/clips/Input/Output/Matte/frame_${frameString}.png`;
-    }
-}
-
-async function view_frames() {
+async function view_frames(isAlpha = false) {
     const params = new URLSearchParams({
         project: PROJECT_NAME,
         export_type: current_view,
@@ -187,18 +162,17 @@ async function view_frames() {
 
     const data = await response.json();
 
-    // Render video preview
-    previewContainer.querySelector("p").classList.add("hidden");
-    imageEl?.classList?.add("hidden");
+    if (!data.video_output) {
+        console.log("Video export hasn't been generated yet for this view.");
+        const success = generate_export(isAlpha ? "AlphaHint" : undefined);
 
-    if (!videoEl) {
-        create_video_element(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`);
-    } else {
-        videoEl.classList.remove("hidden");
-        videoEl.src = `/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`;
+        if (!success) {
+            console.log("Failed to start export generation.");
+            return;
+        }
     }
 
-    if (!fps) count_frames(videoEl);
+    video_viewer(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`);
 }
 
 // Helpers
@@ -248,6 +222,57 @@ function create_image_element(src) {
     previewContainer.append(imageEl);
 }
 
+const generation_progress = document.getElementById("generate-progress");
+
+async function generate_export(custom_view) {
+    generation_progress.classList.remove("hidden");
+    previewContainer.classList.add("hidden");
+
+    generation_progress.innerHTML = `
+        <p class="text-zinc-200 font-semibold">Generating Export</p>
+        <p class="text-zinc-400 text-sm">Starting export…</p>
+    `;
+
+    await fetch(`/api/generateExport?project=${PROJECT_NAME}&export_type=${custom_view || current_view}&fps=${fps || 30}`, { method: "POST" });
+
+    async function poll() {
+        const res = await fetch("/api/exportProgress");
+        const data = await res.json();
+
+        if (data.stage === "converting_exr_to_png") {
+            generation_progress.innerHTML = `
+                <p class="text-zinc-200 font-semibold">Generating Export</p>
+                <p class="text-zinc-400 text-sm">Converting EXR frames to PNG</p>
+                <p class="text-zinc-500 text-xs">${data.current} / ${data.total} (${data.percent}%)</p>
+            `;
+        } else if (data.stage === "stitching_video") {
+            generation_progress.innerHTML = `
+                <p class="text-zinc-200 font-semibold">Generating Export</p>
+                <p class="text-zinc-400 text-sm">Stitching frames into video</p>
+                <p class="text-zinc-500 text-xs">${data.current} / ${data.total} (${data.percent}%)</p>
+            `;
+        } else if (data.stage === "done") {
+            generation_progress.innerHTML = `
+                <p class="text-green-400 font-semibold">Export Complete</p>
+                <p class="text-zinc-400 text-sm">Video is ready!</p>
+            `;
+
+            projectInfo();
+            return;
+        } else if (data.stage === "error") {
+            generation_progress.innerHTML = `
+                <p class="text-red-500 font-semibold">Export Failed</p>
+                <p class="text-zinc-400 text-sm">${data.message}</p>
+            `;
+            return;
+        }
+
+        setTimeout(poll, 500);
+    }
+
+    poll();
+}
+
 function count_frames(video) {
     let frameCount = 0;
 
@@ -280,24 +305,20 @@ function get_thumbnail(videoFileName) {
 }
 
 function click_thumbnail(event) {
-    if (!event?.target) return;
+    const target = event?.target?.closest("li");
+    if (!target) return;
     const views = document.querySelector("#views").children;
 
     for (const view_button of views) {
         const view_type = view_button.textContent;
 
-        if (event.target.textContent.includes(view_type)) {
+        if (target.textContent.includes(view_type)) {
             current_view = view_type;
             toggle_group.querySelector(".btn-primary-sm").classList.replace("btn-primary-sm", "btn-secondary-sm");
             view_button.classList.replace("btn-secondary-sm", "btn-primary-sm");
 
             update_view();
-
-            const previouslySelected = document.querySelector("#exports-list li.selected");
-            if (previouslySelected !== event.target) {
-                previouslySelected?.classList.remove("selected");
-            }
-            event.target.classList.toggle("selected");
+            select_export(target);
             return;
         }
     }

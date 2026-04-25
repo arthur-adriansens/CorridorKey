@@ -154,3 +154,11 @@ ul#exports-list>li {
 li.selected {
     @apply px-2 py-1 rounded bg-corridor-blue text-black bg-clip-padding;
 }
+
+div#export-actions {
+    @apply opacity-0 transition-opacity pointer-events-none;
+}
+
+div:has(>ul#exports-list>li.selected)>div#export-actions {
+    @apply opacity-100 pointer-events-auto;
+}

@@ -12,6 +12,7 @@ let videoDuration,
 let dragging = false;
 
 let current_view = document.querySelector("#views > .btn-primary-sm").textContent;
+const PROJECT_NAME = "260415_191034_Input";
 
 /* 1. SERVER CONNECTION */
 
@@ -182,6 +183,53 @@ collapsables_triggers.forEach((trigger) =>
     }),
 );
 
+// Selectable export list items and actions
+
+const exportActions = document.getElementById("export-actions");
+
+function select_export(target) {
+    if (!exportActions) return;
+
+    const previouslySelected = document.querySelector("#exports-list li.selected");
+    if (previouslySelected !== target) {
+        previouslySelected?.classList.remove("selected");
+    }
+
+    target.classList.toggle("selected");
+    const isSelected = target.classList.contains("selected");
+
+    if (isSelected) {
+        // Download video copy
+        const download_btn = exportActions.querySelector("a#export-download");
+        download_btn.href = `/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`;
+        download_btn.download = `${current_view}_export.mp4`;
+
+        // Open video export file location
+        const regenerate_btn = exportActions.querySelector("button#export-regenerate");
+        regenerate_btn.onclick = () => {};
+
+        // Open video export file location
+        const file_btn = exportActions.querySelector("button#export-open-location");
+        file_btn.onclick = () => {
+            fetch(`/api/showInExplorer/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`);
+        };
+
+        // Remove video export
+        const remove_btn = exportActions.querySelector("button#export-delete");
+        remove_btn.onclick = async () => {
+            const response = fetch(`/api/removeExport/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`);
+
+            if (!response.ok) {
+                console.log("Unable to remove export.");
+                return;
+            }
+
+            const data = await reponse.json();
+            console.log(data);
+        };
+    }
+}
+
 /* 3. FILE HANDLING & PROCESSING */
 
 // Drop zone
@@ -300,6 +348,9 @@ function updateFromEvent(e, progressFromVideo, currentTimeFromVideo) {
         updateUI(`${progressFromVideo}%`, currentTimeFromVideo);
 
         let frameString = currentFrame.toString().padStart(6, "0");
+
+        if (!imageEl) return;
+
         if (current_view == "Alpha") {
             imageEl.src = `/media/${PROJECT_NAME}/clips/Input/AlphaHint/frame_${frameString}.png`;
         } else {
@@ -326,15 +377,11 @@ function updateFromEvent(e, progressFromVideo, currentTimeFromVideo) {
     previousFrame = currentFrame;
 }
 
-// ---------- UI updates ----------
-
 function updateUI(percentage, currentTime) {
     frameLabel.textContent = currentFrame;
     playhead.style.left = percentage;
     timecode.textContent = new Date(currentTime * 1000).toISOString().substr(11, 12);
 }
-
-// ---------- ticks ----------
 
 function buildTicks(count) {
     ticks.innerHTML = "";
@@ -346,8 +393,6 @@ function buildTicks(count) {
         ticks.appendChild(div);
     }
 }
-
-// ---------- get frames ----------
 
 function onFrameChange(frameIndex) {
     if (frameIndex === previousFrame || frameIndex === undefined || !videoEl || !fps) return;

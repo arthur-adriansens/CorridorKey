@@ -31,7 +31,7 @@
                     </ul>
                 </div>
 
-                <div>
+                <div class="pb-4 border-b">
                     <h2 class="text-xs uppercase text-zinc-400 mb-2">Queue</h2>
                     <ul class="space-y-1">
                         <li class="px-2 py-1 rounded hover:bg-zinc-800">empty</li>
@@ -46,6 +46,21 @@
                     <ul class="space-y-1 overflow-x-auto" id="exports-list">
                         <li>no exports</li>
                     </ul>
+
+                    <div class="flex gap-2 mt-2" id="export-actions">
+                        <a class="btn-secondary-sm size-11 cursor-pointer flex" id="export-download" title="download a copy">
+                            <img src="/static/images/download.svg" />
+                        </a>
+                        <button class="btn-secondary-sm size-11" id="export-regenerate" title="regenerate">
+                            <img src="/static/images/regenerate.svg" />
+                        </button>
+                        <button class="btn-secondary-sm size-11" id="export-open-location" title="open file location">
+                            <img src="/static/images/folder.svg" />
+                        </button>
+                        <button class="btn-secondary-sm size-11" id="export-delete" title="delete export">
+                            <img src="/static/images/delete.svg" />
+                        </button>
+                    </div>
                 </div>
 
                 <div class="h-full w-20 group absolute -right-10 top-0 select-none !mt-0">
@@ -77,6 +92,16 @@
                         id="preview"
                     >
                         <p>Preview</p>
+                    </div>
+
+                    <div
+                        class="hidden w-full h-full border-2 border-dashed rounded flex flex-col gap-2 items-center justify-center transition-colors"
+                        id="generate-progress"
+                    >
+                        <p class="text-zinc-200 font-semibold text-center">Generating Export</p>
+                        <p class="text-zinc-400 text-sm text-center">
+                            Video export hasn't been generated yet for this view. Stitching frames together to generate export...
+                        </p>
                     </div>
                 </div>
 
