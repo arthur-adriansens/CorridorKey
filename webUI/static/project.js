@@ -71,6 +71,8 @@ const exportsList = document.getElementById("exports-list");
 function update_exports_list() {
     generation_progress?.classList?.add("hidden");
     previewContainer.classList.remove("hidden");
+
+    if (Object.keys(projectData.exports).length == 0) return;
     exportsList.innerHTML = "";
 
     Object.entries(projectData.exports).forEach(([videoName, videoPath]) => {
@@ -95,13 +97,23 @@ function update_view() {
 
     previewContainer.querySelector("p").classList.add("hidden");
 
+    if (exportsList?.children) {
+        document.querySelector("#exports-list li.selected")?.classList?.remove("selected");
+
+        for (let video of exportsList.children) {
+            if (video?.textContent?.includes(current_view)) {
+                video.classList.add("selected");
+                break;
+            }
+        }
+    }
+
     switch (current_view) {
         case "Original":
             video_viewer(`/media/${PROJECT_NAME}/clips/Input/Source/Input.mp4`);
             break;
 
         case "COMP":
-            view_comp();
             video_viewer(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_Comp_export.mp4`);
             break;
 
@@ -168,8 +180,9 @@ async function view_frames(isAlpha = false) {
 
         if (!success) {
             console.log("Failed to start export generation.");
-            return;
         }
+
+        return;
     }
 
     video_viewer(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`);
@@ -257,6 +270,7 @@ async function generate_export(custom_view) {
                 <p class="text-zinc-400 text-sm">Video is ready!</p>
             `;
 
+            video_viewer(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`);
             projectInfo();
             return;
         } else if (data.stage === "error") {

@@ -147,7 +147,7 @@ def show_in_explorer(path: str):
 
     return {"status": "ok"}
 
-@app.get("/api/removeExport/{path:path}")
+@app.post("/api/removeExport/{path:path}")
 def remove_export(path: str):
     file_path = (PROJECT_ROOT / path).resolve()
 

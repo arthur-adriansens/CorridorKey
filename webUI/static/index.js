@@ -195,7 +195,7 @@ function select_export(target) {
         previouslySelected?.classList.remove("selected");
     }
 
-    target.classList.toggle("selected");
+    target.classList.add("selected");
     const isSelected = target.classList.contains("selected");
 
     if (isSelected) {
@@ -206,7 +206,15 @@ function select_export(target) {
 
         // Open video export file location
         const regenerate_btn = exportActions.querySelector("button#export-regenerate");
-        regenerate_btn.onclick = () => {};
+        regenerate_btn.onclick = async () => {
+            console.log("Regenerating Video export for this view.");
+            const success = generate_export(target.textContent?.includes("Alpha") ? "AlphaHint" : undefined);
+
+            if (!success) {
+                console.log("Failed to start export generation.");
+                return;
+            }
+        };
 
         // Open video export file location
         const file_btn = exportActions.querySelector("button#export-open-location");
@@ -217,15 +225,22 @@ function select_export(target) {
         // Remove video export
         const remove_btn = exportActions.querySelector("button#export-delete");
         remove_btn.onclick = async () => {
-            const response = fetch(`/api/removeExport/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`);
+            const response = await fetch(`/api/removeExport/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`, {
+                method: "POST",
+            });
 
             if (!response.ok) {
                 console.log("Unable to remove export.");
                 return;
             }
 
-            const data = await reponse.json();
-            console.log(data);
+            const data = await response.json();
+
+            if (target?.parentNode?.children?.length === 1) {
+                target.parentNode.innerHTML = "<li>no exports</li>";
+                return;
+            }
+            target.remove();
         };
     }
 }
