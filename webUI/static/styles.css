@@ -1098,6 +1098,15 @@ video {
   color: rgb(239 68 68 / var(--tw-text-opacity, 1));
 }
 
+.\!text-warning {
+  color: #ec942cff !important;
+}
+
+.\!text-success {
+  --tw-text-opacity: 1 !important;
+  color: rgb(32 201 133 / var(--tw-text-opacity, 1)) !important;
+}
+
 .accent-corridor-blue {
   accent-color: #029AD4;
 }
@@ -1490,6 +1499,10 @@ div:has(>ul#exports-list>li.selected)>div#export-actions {
   opacity: 1;
 }
 
+.hover\:cursor-pointer:hover {
+  cursor: pointer;
+}
+
 .hover\:bg-\[\#1f293\]:hover {
   background-color: #1f293;
 }
@@ -1526,6 +1539,10 @@ div:has(>ul#exports-list>li.selected)>div#export-actions {
 
 .\[\&\>\*\]\:hover\:cursor-pointer:hover>* {
   cursor: pointer;
+}
+
+.\[\&\>p\]\:text-warning>p {
+  color: #ec942cff;
 }
 
 .\[\&\>svg\]\:size-5>svg {

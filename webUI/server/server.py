@@ -82,6 +82,12 @@ def project_info(project: str):
     if exports_path.is_dir():
         exports = {export.name: export for export in exports_path.iterdir() if export.is_file()}
 
+    # check if alpha excists
+    alpha_path = (PROJECT_ROOT / project / "clips/Input/AlphaHint")
+    has_alpha = False
+
+    if (alpha_path.is_dir() and os.listdir(alpha_path)):
+        has_alpha = True
     
     return {
         "fps": fps,
@@ -89,7 +95,8 @@ def project_info(project: str):
         "duration": duration,
         "projects": projects,
         "exports": exports,
-        "birefnet_options": birefnet_options
+        "birefnet_options": birefnet_options,
+        "has_alpha": has_alpha,
     }
 
 @app.get("/api/checkOutput")

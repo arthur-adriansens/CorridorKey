@@ -59,6 +59,14 @@ async function projectInfo() {
         });
     }
 
+    // Update hasAlpha label color
+    if (projectData?.has_alpha === true) {
+        const alphaLabel = document.getElementById("hasAlpha");
+
+        alphaLabel.classList.replace("!text-warning", "!text-success");
+        alphaLabel.closest("fieldset").setAttribute("closed", "true");
+    }
+
     update_view();
 
     // Update exports list UI

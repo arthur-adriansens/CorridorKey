@@ -15,8 +15,7 @@
 
             <div class="flex items-center gap-2">
                 <button class="btn-secondary-sm">Import</button>
-                <button class="btn-secondary-sm">Export</button>
-                <button class="btn-primary-sm">Run</button>
+                <button class="btn-primary-sm">Run Interference</button>
             </div>
         </header>
 
@@ -163,11 +162,8 @@
 
                 <form class="h-full space-y-8">
                     <fieldset class="flex flex-col gap-5 border-b pb-8" collapsable>
-                        <legend>
-                            <p class="z-10 [&>*]:hover:cursor-pointer">
-                                <input type="checkbox" id="checked" />
-                                <label for="checked" class="ml-2">Alpha Generation</label>
-                            </p>
+                        <legend id="hasAlpha" class="!text-warning">
+                            Alpha Generation
                             <span></span>
                         </legend>
 
