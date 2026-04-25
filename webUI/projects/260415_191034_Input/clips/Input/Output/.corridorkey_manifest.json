@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "enabled_outputs": [
+    "fg",
+    "matte",
+    "comp",
+    "processed"
+  ],
+  "formats": {
+    "fg": "exr",
+    "matte": "exr",
+    "comp": "png",
+    "processed": "exr"
+  },
+  "params": {
+    "input_is_linear": false,
+    "despill_strength": 0.5,
+    "auto_despeckle": true,
+    "despeckle_size": 400,
+    "despeckle_dilation": 25,
+    "despeckle_blur": 5,
+    "refiner_scale": 1.0,
+    "source_passthrough": true,
+    "edge_erode_px": null,
+    "edge_blur_px": null
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "params": {
+    "input_is_linear": true,
+    "despill_strength": 0.5,
+    "auto_despeckle": true,
+    "despeckle_size": 400,
+    "despeckle_dilation": 25,
+    "despeckle_blur": 5,
+    "refiner_scale": 1.0,
+    "source_passthrough": true,
+    "edge_erode_px": null,
+    "edge_blur_px": null
+  },
+  "output_config": {
+    "fg_enabled": true,
+    "fg_format": "exr",
+    "matte_enabled": true,
+    "matte_format": "exr",
+    "comp_enabled": true,
+    "comp_format": "png",
+    "processed_enabled": true,
+    "processed_format": "exr",
+    "exr_compression": "dwab"
+  },
+  "live_preview": true,
+  "geometry": {
+    "x": 155,
+    "y": 110,
+    "width": 1399,
+    "height": 800
+  },
+  "splitter_sizes": [
+    1117,
+    280
+  ],
+  "vsplitter_sizes": [
+    515,
+    175
+  ],
+  "workspace_path": "C:\\Users\\arthu\\AppData\\Roaming\\EZ-CorridorKey\\Projects\\260415_191034_Input",
+  "selected_clip": "Input",
+  "clip_input_is_linear": {
+    "Input": true
+  }
+}

@@ -51,4 +51,4 @@ BiRefNetModule/checkpoints/*
 
 site
 
-webUI/projects
+# webUI/projects
