@@ -1,0 +1,146 @@
+{
+    "inferenceControls": {
+        "colorSpace": {
+            "label": "Color Space",
+            "description": "Defines how CorridorKey interprets the input footage before inference. If the input looks wrong here, all inference outputs will be based on that incorrect interpretation. Changing this after inference does not rewrite existing output files."
+        },
+        "despillStrength": {
+            "label": "Despill Strength",
+            "description": "Controls the intensity of green spill removal on the foreground. Higher values remove more spill but may affect fine edge detail."
+        },
+        "despeckle": {
+            "label": "Despeckle",
+            "description": "Removes small isolated artifacts from the matte. Any disconnected regions smaller than the threshold (in pixels) will be removed."
+        },
+        "refinerScale": {
+            "label": "Refiner Scale",
+            "description": "Controls edge refinement quality. Higher values improve edge detail at the cost of processing time. A value of 0 disables refinement entirely."
+        },
+        "livePreview": {
+            "label": "Live Preview",
+            "description": "When enabled, the current frame is reprocessed automatically whenever parameters change. The first adjustment after launch may briefly pause while the inference engine loads."
+        }
+    },
+    "outputFormats": {
+        "fg": {
+            "label": "FG Output",
+            "description": "Exports the isolated foreground with green spill removed. Can be written as EXR or PNG."
+        },
+        "matte": {
+            "label": "Matte Output",
+            "description": "Exports a single-channel alpha matte where white represents foreground and black represents transparency."
+        },
+        "comp": {
+            "label": "Comp Output",
+            "description": "Exports a visual composite of the key over a checkerboard background. Intended for review, not compositing."
+        },
+        "processed": {
+            "label": "Processed Output",
+            "description": "Exports full RGBA straight-alpha output in linear color space. Intended for compositing and color pipelines such as DaVinci Resolve or Nuke."
+        }
+    },
+    "alphaGeneration": {
+        "birefnet": {
+            "label": "BiRefNet",
+            "description": "Fast, high-quality one-click alpha generator suitable for a wide range of footage. Recommended default option."
+        },
+        "gvmAuto": {
+            "label": "GVM Auto",
+            "description": "Automatic green-screen matting optimized for people. Works best on traditional green screen footage."
+        },
+        "trackMask": {
+            "label": "Track Mask",
+            "description": "Uses painted foreground and background strokes as prompts to generate a dense tracked mask using SAM2."
+        },
+        "matanyone2": {
+            "label": "MatAnyone2",
+            "description": "Advanced matting model that refines masks generated from tracked prompts. Useful for complex edges and motion."
+        },
+        "videomama": {
+            "label": "VideoMaMa",
+            "description": "High-quality temporal matting model that produces smooth, stable alpha mattes over time."
+        },
+        "importAlpha": {
+            "label": "Import Alpha",
+            "description": "Allows importing external alpha mattes from other tools. Supported formats include image sequences and standard video files. Imported alphas replace existing hints if confirmed."
+        }
+    },
+    "viewModes": {
+        "input": {
+            "label": "Input",
+            "description": "Shows the original unprocessed footage as interpreted by CorridorKey."
+        },
+        "mask": {
+            "label": "Mask",
+            "description": "Displays painted foreground and background strokes used to guide mask tracking and matting."
+        },
+        "alpha": {
+            "label": "Alpha",
+            "description": "Shows the alpha hint currently used as input for inference."
+        },
+        "fg": {
+            "label": "Foreground",
+            "description": "Displays the extracted foreground with green spill removed."
+        },
+        "matte": {
+            "label": "Matte",
+            "description": "Displays the inferred alpha matte (white = opaque, black = transparent)."
+        },
+        "comp": {
+            "label": "Composite",
+            "description": "Shows the final composite over a checkerboard background."
+        },
+        "processed": {
+            "label": "Processed",
+            "description": "Shows the final straight-alpha RGBA output intended for production use."
+        }
+    },
+    "preferences": {
+        "showTooltips": {
+            "label": "Show Tooltips",
+            "description": "Enables helpful explanations on all interactive UI controls."
+        },
+        "uiSounds": {
+            "label": "UI Sounds",
+            "description": "Plays sound effects for actions such as starting jobs or completing inference."
+        },
+        "copySourceVideos": {
+            "label": "Copy Source Videos",
+            "description": "Copies imported videos into the project folder. When disabled, source files are referenced in place."
+        },
+        "loopPlayback": {
+            "label": "Loop Playback",
+            "description": "Loops playback within the defined in/out range while scrubbing or playing the timeline."
+        },
+        "defaultOutputDirectory": {
+            "label": "Default Output Directory",
+            "description": "Sets a global output location for inference results. Outputs are organized by project and clip name to prevent collisions."
+        }
+    },
+    "statusStates": {
+        "extracting": {
+            "label": "Extracting",
+            "description": "The video is currently being extracted into an image sequence."
+        },
+        "raw": {
+            "label": "Raw",
+            "description": "Frames are loaded but no alpha hint has been generated yet."
+        },
+        "masked": {
+            "label": "Masked",
+            "description": "Paint strokes exist and the clip is ready for mask tracking or matting."
+        },
+        "ready": {
+            "label": "Ready",
+            "description": "An alpha hint is available and the clip is ready to run inference."
+        },
+        "complete": {
+            "label": "Complete",
+            "description": "Inference has finished and output files have been written."
+        },
+        "error": {
+            "label": "Error",
+            "description": "Processing failed. The operation can be retried."
+        }
+    }
+}

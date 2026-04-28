@@ -1,7 +1,8 @@
 /* This JS script contains code for
     1. SERVER CONNECTION, 
     2. DYNAMIC UI,
-    3. FILE HANDLING & PROCESSING */
+    3. FILE HANDLING & PROCESSING,
+    4. FRAME TRACK SELECTOR */
 
 // Global variables
 let fps, videoEl, imageEl, playPauseButton;
@@ -84,14 +85,20 @@ function updateVRAMBar(gpuInfo) {
 update_gpu_status();
 const intervalID2 = setInterval(update_gpu_status, 3 * 1000);
 
+// Server task displayer
+
+// Todo: naast status: "- Uploading... <loading bar>" als iets aan het fetchen
+// custom fetch misschien?
+
 /* 2. DYNAMIC UI */
 
 // Dynamic label that show input slider's value
 
-const sliders = document.querySelectorAll("#dynamic-labels input");
+const sliders = document.querySelectorAll("#dynamic-labels input[type='range']");
 
 const updateDynamicLabel = (input) => {
     const span = input.parentNode.querySelector(`#${input.id}-label`);
+    if (!span) return;
     span.textContent = input.value;
 };
 
@@ -244,6 +251,92 @@ function select_export(target) {
         };
     }
 }
+
+// Explenation dialog
+
+const dialog = document.getElementById("explain-dialog");
+const GAP = 8;
+
+let explanations;
+(async () => {
+    const response = await fetch("/static/explanations.json");
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    explanations = data;
+})();
+
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+}
+
+function positionDialog(target) {
+    const targetRect = target.getBoundingClientRect();
+    const dialogRect = dialog.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    const placements = [
+        // bottom
+        {
+            top: targetRect.bottom + GAP,
+            left: targetRect.left + targetRect.width / 2 - dialogRect.width / 2,
+            fits: targetRect.bottom + GAP + dialogRect.height <= vh,
+        },
+        // top
+        {
+            top: targetRect.top - dialogRect.height - GAP,
+            left: targetRect.left + targetRect.width / 2 - dialogRect.width / 2,
+            fits: targetRect.top - GAP - dialogRect.height >= 0,
+        },
+        // right
+        {
+            top: targetRect.top + targetRect.height / 2 - dialogRect.height / 2,
+            left: targetRect.right + GAP,
+            fits: targetRect.right + GAP + dialogRect.width <= vw,
+        },
+        // left
+        {
+            top: targetRect.top + targetRect.height / 2 - dialogRect.height / 2,
+            left: targetRect.left - dialogRect.width - GAP,
+            fits: targetRect.left - GAP - dialogRect.width >= 0,
+        },
+    ];
+
+    const placement = placements.find((p) => p.fits) || placements[0];
+
+    dialog.style.top = clamp(placement.top, GAP, vh - dialogRect.height - GAP) + "px";
+    dialog.style.left = clamp(placement.left, GAP, vw - dialogRect.width - GAP) + "px";
+}
+
+function getExplain(path, obj) {
+    return path.split(".").reduce((o, k) => o?.[k], obj);
+}
+
+const dialog_title = document.getElementById("dialog-title");
+const dialog_text = document.getElementById("dialog-text");
+
+document.addEventListener("mouseover", (e) => {
+    const target = e.target.closest("[data-explain]");
+    if (!target?.dataset?.explain || !explanations) return;
+
+    const explainData = getExplain(target.dataset.explain, explanations);
+    if (!explainData) return;
+
+    dialog_title.textContent = explainData.label;
+    dialog_text.textContent = explainData.description;
+
+    dialog.classList.replace("opacity-0", "delay-500");
+
+    requestAnimationFrame(() => positionDialog(target)); // Must be visible before measuring
+});
+
+document.addEventListener("mouseout", (e) => {
+    if (!e.target.closest("[data-explain]")) return;
+
+    dialog.classList.replace("delay-500", "opacity-0");
+});
 
 /* 3. FILE HANDLING & PROCESSING */
 

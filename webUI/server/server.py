@@ -86,6 +86,13 @@ def project_info(project: str):
     alpha_path = (PROJECT_ROOT / project / "clips/Input/AlphaHint")
     has_alpha = False
 
+    # get options
+    options_path = (PROJECT_ROOT / project / ".corridorkey_session.json")
+    options = {}
+    if (PROJECT_ROOT / project).is_dir() and options_path.is_file():
+        with open(options_path, "r") as file:
+            options = json.load(file)
+
     if (alpha_path.is_dir() and os.listdir(alpha_path)):
         has_alpha = True
     
@@ -96,6 +103,7 @@ def project_info(project: str):
         "projects": projects,
         "exports": exports,
         "birefnet_options": birefnet_options,
+        "options": options,
         "has_alpha": has_alpha,
     }
 

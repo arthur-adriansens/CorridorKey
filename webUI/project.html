@@ -14,7 +14,7 @@
             </a>
 
             <div class="flex items-center gap-2">
-                <button class="btn-secondary-sm">Import</button>
+                <a href="/" class="btn-secondary-sm">New Project</a>
                 <button class="btn-primary-sm">Run Interference</button>
             </div>
         </header>
@@ -172,9 +172,9 @@
                             <div class="text-zinc-400 text-sm">Automatic</div>
 
                             <div class="grid grid-cols-2 grid-rows-2 gap-2">
-                                <button class="btn-primary col-span-2" title="Fast automatic alpha using GVM">GVM Auto</button>
+                                <button class="btn-primary col-span-2" data-explain="alphaGeneration.gvmAuto">GVM Auto</button>
 
-                                <button class="btn-secondary" title="Deep learning based alpha estimation">BiRefNet</button>
+                                <button class="btn-secondary" data-explain="alphaGeneration.birefnet">BiRefNet</button>
 
                                 <select id="birefnet-options" class="btn-secondary px-2">
                                     <option>Options</option>
@@ -186,17 +186,11 @@
                         <div class="space-y-2">
                             <div class="text-zinc-400 text-sm">Assisted</div>
 
-                            <button class="w-full btn-secondary" title="Paint subject and background strokes to guide alpha generation">
-                                Track Mask
-                            </button>
+                            <button class="w-full btn-secondary" data-explain="alphaGeneration.trackMask">Track Mask</button>
                             <p class="text-xs text-zinc-500 pb-4 border-b">Requires brushtrokes: paint subject with 1 and background with 2.</p>
 
-                            <button class="w-full btn-secondary !mt-4" title="Paint subject and background strokes to guide alpha generation">
-                                MATANYONE2
-                            </button>
-                            <button class="w-full btn-secondary !mt-4" title="Paint subject and background strokes to guide alpha generation">
-                                VIDEOMAMA
-                            </button>
+                            <button class="w-full btn-secondary !mt-4" data-explain="alphaGeneration.matanyone2">MATANYONE2</button>
+                            <button class="w-full btn-secondary !mt-4" data-explain="alphaGeneration.videomama">VIDEOMAMA</button>
                             <p class="text-xs text-zinc-500">Requires paintstrokes on frame one.</p>
                         </div>
 
@@ -204,59 +198,139 @@
                         <div class="space-y-2">
                             <div class="text-zinc-400 text-sm">Existing</div>
 
-                            <button class="w-full btn-outline" title="Import existing alpha channel">Import Alpha</button>
+                            <button class="w-full btn-outline" data-explain="alphaGeneration.importAlpha">Import Alpha</button>
                         </div>
                     </fieldset>
 
                     <!-- MODEL -->
-                    <fieldset class="flex flex-col gap-3 border-b pb-8" collapsable>
+                    <fieldset class="flex flex-col gap-5 border-b pb-8" closed="true" collapsable>
                         <legend>
                             Model
                             <span></span>
                         </legend>
 
-                        <label class="text-zinc-400 text-sm" for="backend">Backend</label>
-                        <select id="backend" class="mt-1 w-full bg-zinc-800 border rounded outline-none px-2 py-2">
-                            <option>CorridorKey</option>
-                            <option>CorridorKey Lite</option>
-                            <option>MLX</option>
-                        </select>
+                        <div class="space-y-2">
+                            <label class="text-zinc-400 text-sm" for="backend">Backend</label>
+                            <select id="backend" class="mt-1 w-full bg-zinc-800 border rounded outline-none px-2 py-2">
+                                <option>CorridorKey</option>
+                                <option>CorridorKey Lite</option>
+                                <option>MLX</option>
+                            </select>
+                        </div>
                     </fieldset>
 
                     <!-- KEYING -->
-                    <fieldset class="flex flex-col gap-3 border-b pb-8" id="dynamic-labels" collapsable>
+                    <fieldset class="flex flex-col gap-5 border-b pb-8" id="dynamic-labels" id="interference-options" collapsable>
                         <legend>
-                            Keying
+                            Interference options
                             <span></span>
                         </legend>
 
-                        <label class="text-zinc-400 text-sm" for="despill">Despill: <span id="despill-label"></span></label>
-                        <input type="range" min="0.0" max="1.0" step="0.1" class="w-full accent-corridor-blue" id="despill" />
+                        <div class="space-y-2" data-explain="inferenceControls.colorSpace">
+                            <label class="text-zinc-400 text-sm cursor-pointer" for="colors">Color Space</label>
+                            <select id="colors" class="mt-1 w-full bg-zinc-800 border rounded px-2 py-2">
+                                <option>sRGB</option>
+                                <option>Linear</option>
+                            </select>
+                        </div>
 
-                        <label class="text-zinc-400 text-sm" for="refiner">Refiner: <span id="refiner-label"></span></label>
-                        <input type="range" min="0.0" max="3.0" step="0.1" value="1.0" class="w-full accent-corridor-blue" id="refiner" />
+                        <div class="space-y-2" data-explain="inferenceControls.despillStrength">
+                            <label class="text-zinc-400 text-sm cursor-pointer" for="despill_strength"
+                                >Despill: <span id="despill_strength-label"></span
+                            ></label>
+                            <input type="range" min="0.0" max="1.0" step="0.1" class="w-full accent-corridor-blue" id="despill_strength" />
+                        </div>
+
+                        <div class="flex gap-2 items-center" data-explain="inferenceControls.despeckle">
+                            <input type="checkbox" class="z-20 cursor-pointer peer" id="auto_despeckle" checked />
+                            <label
+                                class="text-zinc-400 text-sm cursor-not-allowed opacity-50 transition-opacity peer-checked:cursor-pointer peer-checked:opacity-100"
+                                for="despeckle_size"
+                                >Despeckle:
+                            </label>
+                            <input
+                                type="number"
+                                min="50"
+                                max="2000"
+                                step="10"
+                                value="400"
+                                class="w-full btn-secondary-sm outline-none opacity-50 transition-opacity peer-checked:opacity-100 cursor-not-allowed peer-checked:cursor-auto"
+                                id="despeckle_size"
+                            />
+                        </div>
+
+                        <div class="space-y-2" data-explain="inferenceControls.refinerScale">
+                            <label class="text-zinc-400 text-sm cursor-pointer" for="refiner_scale"
+                                >Refiner: <span id="refiner_scale-label"></span
+                            ></label>
+                            <input type="range" min="0.0" max="3.0" step="0.1" value="1.0" class="w-full accent-corridor-blue" id="refiner_scale" />
+                        </div>
+
+                        <div class="flex gap-2" data-explain="inferenceControls.livePreview">
+                            <input type="checkbox" class="z-20 cursor-pointer" id="preview-live" checked />
+                            <label class="text-zinc-400 text-sm cursor-pointer" for="preview-live">Live Preview </label>
+                        </div>
                     </fieldset>
 
                     <!-- OUTPUT -->
-                    <fieldset class="flex flex-col gap-3 border-b pb-8" collapsable>
+                    <fieldset class="flex flex-col gap-5 border-b pb-8" collapsable>
                         <legend>
                             Output
                             <span></span>
                         </legend>
 
-                        <label class="text-zinc-400 text-sm" for="format">Format</label>
-                        <select id="format" class="mt-1 w-full bg-zinc-800 border rounded px-2 py-2">
-                            <option>EXR (RGBA)</option>
-                            <option>PNG Sequence</option>
-                            <option>ProRes 4444</option>
-                        </select>
-
-                        <label class="text-zinc-400 text-sm" for="resolution">Resolution</label>
-                        <select id="resolution" class="mt-1 w-full bg-zinc-800 border rounded px-2 py-2">
-                            <option>Source</option>
-                            <option>Half</option>
-                            <option>Quarter</option>
-                        </select>
+                        <div class="flex gap-2 z-20 items-center justify-between" data-explain="outputFormats.fg">
+                            <label class="peer text-zinc-400 text-sm opacity-50 transition-opacity cursor-pointer has-[input:checked]:opacity-100">
+                                <input type="checkbox" class="cursor-pointer mr-2" id="fg_enabled" checked />
+                                FG
+                            </label>
+                            <select
+                                class="mt-1 bg-zinc-800 border rounded px-2 py-2 opacity-50 transition-opacity cursor-not-allowed peer-has-[input:checked]:cursor-pointer peer-has-[input:checked]:opacity-100"
+                                id="fg_format"
+                            >
+                                <option>png</option>
+                                <option>exr</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2 z-20 items-center justify-between" data-explain="outputFormats.matte">
+                            <label class="peer text-zinc-400 text-sm opacity-50 transition-opacity cursor-pointer has-[input:checked]:opacity-100">
+                                <input type="checkbox" class="cursor-pointer mr-2" id="matte_enabled" checked />
+                                Matte
+                            </label>
+                            <select
+                                class="mt-1 bg-zinc-800 border rounded px-2 py-2 opacity-50 transition-opacity cursor-not-allowed peer-has-[input:checked]:cursor-pointer peer-has-[input:checked]:opacity-100"
+                                id="matte_format"
+                            >
+                                <option>png</option>
+                                <option>exr</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2 z-20 items-center justify-between" data-explain="outputFormats.comp">
+                            <label class="peer text-zinc-400 text-sm opacity-50 transition-opacity cursor-pointer has-[input:checked]:opacity-100">
+                                <input type="checkbox" class="cursor-pointer mr-2" id="comp_enabled" checked />
+                                Comp
+                            </label>
+                            <select
+                                class="mt-1 bg-zinc-800 border rounded px-2 py-2 opacity-50 transition-opacity cursor-not-allowed peer-has-[input:checked]:cursor-pointer peer-has-[input:checked]:opacity-100"
+                                id="comp_format"
+                            >
+                                <option>png</option>
+                                <option>exr</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2 z-20 items-center justify-between" data-explain="outputFormats.processed">
+                            <label class="peer text-zinc-400 text-sm opacity-50 transition-opacity cursor-pointer has-[input:checked]:opacity-100">
+                                <input type="checkbox" class="cursor-pointer mr-2" id="processed_enabled" checked />
+                                Processed
+                            </label>
+                            <select
+                                class="mt-1 bg-zinc-800 border rounded px-2 py-2 opacity-50 transition-opacity cursor-not-allowed peer-has-[input:checked]:cursor-pointer peer-has-[input:checked]:opacity-100"
+                                id="processed_format"
+                            >
+                                <option>png</option>
+                                <option>exr</option>
+                            </select>
+                        </div>
                     </fieldset>
                 </form>
             </aside>
@@ -279,6 +353,15 @@
                 </div>
             </div>
         </footer>
+
+        <div
+            id="explain-dialog"
+            class="fixed z-30 max-w-xs rounded-md bg-corridor-dark text-white text-sm p-3 opacity-0 pointer-events-none transition-opacity delay-500 border border-corridor-blue"
+        >
+            <!-- Dynamic Content -->
+            <div class="font-semibold mb-1" id="dialog-title"></div>
+            <div class="opacity-80" id="dialog-text"></div>
+        </div>
 
         <script src="/static/index.js"></script>
         <script src="/static/project.js"></script>

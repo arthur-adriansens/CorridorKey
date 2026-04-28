@@ -4,13 +4,13 @@
 
 /* 1. PROJECT SETUP */
 
-projectInfo();
+load_project();
 
 // Setup
 
 let projectData = {};
 
-async function projectInfo() {
+async function load_project() {
     const params = new URLSearchParams({
         project: PROJECT_NAME,
     });
@@ -67,6 +67,29 @@ async function projectInfo() {
         alphaLabel.closest("fieldset").setAttribute("closed", "true");
     }
 
+    // Update options
+    if (projectData?.options?.params) {
+        const parameters = { ...projectData.options.params, ...projectData.options.output_config };
+
+        for (let option in parameters) {
+            const input = document.getElementById(option);
+            if (!input) continue;
+
+            const input_type = input.type;
+            if (input_type == "checkbox") {
+                console.log(input);
+                input.checked = parameters[option];
+            }
+
+            input.value = parameters[option];
+            updateDynamicLabel(input);
+        }
+
+        // for (let option)
+
+        document.getElementById("preview-live").checked = projectData.options.live_preview;
+    }
+
     update_view();
 
     // Update exports list UI
@@ -76,6 +99,7 @@ async function projectInfo() {
 }
 
 const exportsList = document.getElementById("exports-list");
+
 function update_exports_list() {
     generation_progress?.classList?.add("hidden");
     previewContainer.classList.remove("hidden");
@@ -279,7 +303,7 @@ async function generate_export(custom_view) {
             `;
 
             video_viewer(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`);
-            projectInfo();
+            load_project();
             return;
         } else if (data.stage === "error") {
             generation_progress.innerHTML = `

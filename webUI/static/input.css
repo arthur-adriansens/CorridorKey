@@ -133,8 +133,12 @@ fieldset[collapsable][closed]>legend>span {
 }
 
 
-fieldset[collapsable][closed] {
-    @apply h-0 pb-4;
+fieldset[collapsable][closed="true"] {
+    @apply h-0 pb-3 [&>legend]:mb-0;
+}
+
+fieldset[collapsable][closed="true"]:not(:first-child) {
+    @apply !mt-3;
 }
 
 fieldset[collapsable][closed]>:not(legend) {

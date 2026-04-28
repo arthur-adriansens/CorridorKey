@@ -7,6 +7,7 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
 ## Developer notes
 
 ### Prerequisites
+
 - Python 3.10 or newer: [Python downloads](https://www.python.org/downloads/)
 - Node.js and npm for Tailwind development: [Node.js](https://nodejs.org/en)
 
@@ -38,16 +39,19 @@ FFmpeg also needs to be installed.
 Download FFmpeg here: [ffmpeg.org/download.html](https://ffmpeg.org/download.html)
 
 ### Windows
+
 ```bash
 winget install "FFmpeg (Essentials Build)"
 ```
 
 ### macOS
+
 ```bash
 brew install ffmpeg
 ```
 
 ### Ubuntu / Debian
+
 ```bash
 sudo apt update && sudo apt install -y ffmpeg
 ```
@@ -70,7 +74,6 @@ cd webUI && tailwindcss -i static/input.css -o static/styles.css --watch # run t
 That’s it.
 
 ## Questions?
-
 
 DM [Art on Discord](https://discord.com/users/714418367209144330).
 Join the [Discord](https://discord.gg/zvwUrdWXJm) — it's the fastest way to get help or discuss ideas before opening a PR.
