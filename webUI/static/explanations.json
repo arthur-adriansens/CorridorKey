@@ -2,7 +2,7 @@
     "inferenceControls": {
         "colorSpace": {
             "label": "Color Space",
-            "description": "Defines how CorridorKey interprets the input footage before inference. If the input looks wrong here, all inference outputs will be based on that incorrect interpretation. Changing this after inference does not rewrite existing output files."
+            "description": "DOESNT WORK YET - Defines how CorridorKey interprets the input footage before inference. If the input looks wrong here, all inference outputs will be based on that incorrect interpretation. Changing this after inference does not rewrite existing output files."
         },
         "despillStrength": {
             "label": "Despill Strength",

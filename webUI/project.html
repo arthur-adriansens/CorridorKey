@@ -160,7 +160,7 @@
                     ></div>
                 </div>
 
-                <form class="h-full space-y-8">
+                <form class="h-full space-y-8" id="parameters">
                     <fieldset class="flex flex-col gap-5 border-b pb-8" collapsable>
                         <legend id="hasAlpha" class="!text-warning">
                             Alpha Generation
@@ -203,7 +203,7 @@
                     </fieldset>
 
                     <!-- MODEL -->
-                    <fieldset class="flex flex-col gap-5 border-b pb-8" closed="true" collapsable>
+                    <fieldset class="flex flex-col gap-5 border-b pb-8" collapsable>
                         <legend>
                             Model
                             <span></span>
@@ -267,8 +267,8 @@
                         </div>
 
                         <div class="flex gap-2" data-explain="inferenceControls.livePreview">
-                            <input type="checkbox" class="z-20 cursor-pointer" id="preview-live" checked />
-                            <label class="text-zinc-400 text-sm cursor-pointer" for="preview-live">Live Preview </label>
+                            <input type="checkbox" class="z-20 cursor-pointer" id="live_preview" checked />
+                            <label class="text-zinc-400 text-sm cursor-pointer" for="live_preview">Live Preview </label>
                         </div>
                     </fieldset>
 

@@ -606,10 +606,6 @@ video {
   z-index: 30;
 }
 
-.z-10 {
-  z-index: 10;
-}
-
 .col-span-2 {
   grid-column: span 2 / span 2;
 }
@@ -785,10 +781,6 @@ video {
 
 .flex-col {
   flex-direction: column;
-}
-
-.content-between {
-  align-content: space-between;
 }
 
 .items-center {
@@ -1557,36 +1549,12 @@ div:has(>ul#exports-list>li.selected)>div#export-actions {
   opacity: 1;
 }
 
-.has-\[checked\]\:cursor-pointer:has(checked) {
-  cursor: pointer;
-}
-
-.has-\[input\:checked\]\:cursor-pointer:has(input:checked) {
-  cursor: pointer;
-}
-
-.has-\[checked\]\:opacity-100:has(checked) {
-  opacity: 1;
-}
-
 .has-\[input\:checked\]\:opacity-100:has(input:checked) {
   opacity: 1;
 }
 
-.has-\[input\:checked\]\:\!opacity-100:has(input:checked) {
-  opacity: 1 !important;
-}
-
-.peer:has(checked) ~ .peer-has-\[checked\]\:cursor-pointer {
-  cursor: pointer;
-}
-
 .peer:has(input:checked) ~ .peer-has-\[input\:checked\]\:cursor-pointer {
   cursor: pointer;
-}
-
-.peer:has(checked) ~ .peer-has-\[checked\]\:opacity-100 {
-  opacity: 1;
 }
 
 .peer:has(input:checked) ~ .peer-has-\[input\:checked\]\:opacity-100 {

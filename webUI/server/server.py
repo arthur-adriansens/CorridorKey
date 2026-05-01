@@ -11,8 +11,6 @@ import platform
 import json
 import sys
 import os
-import re
-import time
 
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../..")))
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" # enable exr support by cv2
@@ -42,7 +40,7 @@ EXPORT_PROGRESS = {
 PROGRESS_LOCK = Lock()
 
 app = FastAPI() 
-print("Server started.")
+print("\nServer started! Only (critical) errors and warnings will show up here.")
 
 # -------------------
 # API
@@ -186,6 +184,30 @@ def remove_export(path: str):
 
     return {"status": "ok"}
 
+@app.post("/api/updateParameters")
+def update_json(payload: dict):
+    options = payload.get("options", {})
+    project = payload.get("project")
+
+    if not project or len(options) == 0:
+        raise HTTPException(status_code=400, detail="Project and options is required")
+
+    project_dir = PROJECT_ROOT / project
+    if not project_dir.is_dir():
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    options_path = project_dir / ".corridorkey_session.json"
+
+    try:
+        with open(options_path, "w", encoding="utf-8") as file:
+            json.dump(options, file, indent=2)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to save options: {exc}")
+
+    print(f"Updated project {project}.")
+
+    return {"status": f"Options saved for project {project}"}
+
 # -------------------
 # Media files
 # -------------------
@@ -233,7 +255,6 @@ app.mount("/", StaticFiles(directory=ROOT, html=True), name="static")
 # -------------------
 
 def get_video_thumbnail(video_path: str, output_size: tuple = (320, 180)) -> bytes:
-    print(video_path)
     try:
         video = cv2.VideoCapture(video_path)
         

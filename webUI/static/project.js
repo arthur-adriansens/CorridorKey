@@ -76,10 +76,7 @@ async function load_project() {
             if (!input) continue;
 
             const input_type = input.type;
-            if (input_type == "checkbox") {
-                console.log(input);
-                input.checked = parameters[option];
-            }
+            if (input_type == "checkbox") input.checked = parameters[option];
 
             input.value = parameters[option];
             updateDynamicLabel(input);
@@ -87,7 +84,7 @@ async function load_project() {
 
         // for (let option)
 
-        document.getElementById("preview-live").checked = projectData.options.live_preview;
+        document.getElementById("live_preview").checked = projectData.options.live_preview;
     }
 
     update_view();
@@ -369,3 +366,52 @@ function click_thumbnail(event) {
         }
     }
 }
+
+// Update (& remember) the parameters object
+
+const parametersForm = document.querySelector("form#parameters");
+for (let element of parametersForm.elements) {
+    if (element.id) {
+        element.addEventListener("change", updateParameter);
+    }
+}
+
+async function updateParameter(event) {
+    // Update options locally
+    const input = event.target;
+    if (projectData?.options?.version === undefined) return;
+
+    const old_value = findKey(projectData.options, input.id);
+    // console.log(projectData.options, input.id, old_value);
+    if (old_value === undefined) return;
+
+    let new_value = input.type == "checkbox" ? input.checked : input.value;
+    if ((!typeof new_value) in ["boolean", "options"] && +new_value !== NaN) new_value = +new_value;
+
+    setKey(projectData.options, input.id, new_value);
+
+    // Upload options
+    const response = await fetch("/api/updateParameters", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            options: projectData.options,
+            project: PROJECT_NAME,
+        }),
+    });
+
+    if (!response.ok) {
+        console.log("Unable to update parameter.");
+        return;
+    }
+
+    const data = await response.json();
+    console.log(data);
+}
+
+// Nested object helpers
+const findKey = (obj, key) =>
+    obj && typeof obj === "object" ? (obj[key] ?? Object.values(obj).reduce((found, value) => found ?? findKey(value, key), undefined)) : undefined;
+
+const setKey = (obj, key, value) =>
+    obj && typeof obj === "object" ? (key in obj ? ((obj[key] = value), true) : Object.values(obj).some((v) => setKey(v, key, value))) : false;
