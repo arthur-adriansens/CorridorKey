@@ -382,7 +382,6 @@ async function updateParameter(event) {
     if (projectData?.options?.version === undefined) return;
 
     const old_value = findKey(projectData.options, input.id);
-    // console.log(projectData.options, input.id, old_value);
     if (old_value === undefined) return;
 
     let new_value = input.type == "checkbox" ? input.checked : input.value;
@@ -406,7 +405,7 @@ async function updateParameter(event) {
     }
 
     const data = await response.json();
-    console.log(data);
+    // console.log(data);
 }
 
 // Nested object helpers
@@ -415,3 +414,17 @@ const findKey = (obj, key) =>
 
 const setKey = (obj, key, value) =>
     obj && typeof obj === "object" ? (key in obj ? ((obj[key] = value), true) : Object.values(obj).some((v) => setKey(v, key, value))) : false;
+
+// Run interference button
+async function run_interference() {
+    const params = new URLSearchParams({
+        project: PROJECT_NAME,
+    });
+    const response = await fetch(`/api/runInterference?${params}`);
+
+    if (!response.ok) {
+        const message = await response.json();
+        console.log("Unable to fetch project. Error:", message.detail);
+        return;
+    }
+}

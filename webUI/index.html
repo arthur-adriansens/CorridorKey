@@ -14,9 +14,7 @@
             </a>
 
             <div class="flex items-center gap-2">
-                <button class="btn-secondary-sm">Import</button>
-                <button class="btn-secondary-sm">Export</button>
-                <button class="btn-primary-sm">Run</button>
+                <button class="btn-secondary-sm" onclick="document.getElementById('drop-zone')?.click()">Import</button>
             </div>
         </header>
 
@@ -26,16 +24,15 @@
             <aside class="p-3 text-sm relative h-full overflow-y-auto overflow-x-hidden" id="left">
                 <div class="mb-4">
                     <h2 class="text-xs uppercase text-zinc-400 mb-2">Projects</h2>
-                    <ul class="space-y-1">
-                        <a href="/project"><li class="px-2 py-1 rounded hover:bg-zinc-800">Clip 1</li></a>
-                        <a href="/project"><li class="px-2 py-1 rounded hover:bg-zinc-800">Clip 2</li></a>
+                    <ul class="space-y-1" id="projects-list">
+                        <a href="/project"><li class="px-2 py-1 rounded hover:bg-zinc-800">Project 1</li></a>
                     </ul>
                 </div>
 
                 <div>
                     <h2 class="text-xs uppercase text-zinc-400 mb-2">Queue</h2>
                     <ul class="space-y-1">
-                        <li class="px-2 py-1 rounded hover:bg-zinc-800">Nothing in queue</li>
+                        <li class="px-2 py-1 rounded hover:bg-zinc-800">empty</li>
                     </ul>
                 </div>
 
@@ -52,13 +49,13 @@
                 <!-- VIEW TOOLBAR -->
                 <div class="flex items-center gap-2 px-3 py-2 border-b text-xs" toggle-group>
                     <p class="text-zinc-400">View</p>
-                    <button class="btn-secondary-sm">Original</button>
-                    <button class="btn-secondary-sm">Mask</button>
-                    <button class="btn-secondary-sm">Alpha</button>
-                    <button class="btn-secondary-sm">FG</button>
-                    <button class="btn-secondary-sm">MATTE</button>
-                    <button class="btn-secondary-sm">COMP</button>
-                    <button class="btn-primary-sm">PROC</button>
+                    <button class="btn-primary-sm">Original</button>
+                    <button class="btn-secondary-sm" disabled>Alpha</button>
+                    <button class="btn-secondary-sm" disabled>Mask</button>
+                    <button class="btn-secondary-sm" disabled>FG</button>
+                    <button class="btn-secondary-sm" disabled>Matte</button>
+                    <button class="btn-secondary-sm" disabled>Comp</button>
+                    <button class="btn-secondary-sm" disabled>Processed</button>
                 </div>
 
                 <!-- PREVIEW CANVAS -->
@@ -120,7 +117,7 @@
                 </div>
 
                 <form class="h-full space-y-8">
-                    <fieldset class="flex flex-col gap-5 border-b pb-8" collapsable>
+                    <fieldset class="flex flex-col gap-5 border-b pb-8" closed="true" collapsable>
                         <legend>
                             Alpha Generation
                             <span></span>
@@ -169,7 +166,7 @@
                     </fieldset>
 
                     <!-- MODEL -->
-                    <fieldset class="flex flex-col gap-3 border-b pb-8" collapsable>
+                    <fieldset class="flex flex-col gap-3 border-b pb-8" closed="true" collapsable>
                         <legend>
                             Model
                             <span></span>
@@ -184,7 +181,7 @@
                     </fieldset>
 
                     <!-- KEYING -->
-                    <fieldset class="flex flex-col gap-3 border-b pb-8" id="dynamic-labels" collapsable>
+                    <fieldset class="flex flex-col gap-3 border-b pb-8" id="dynamic-labels" closed="true" collapsable>
                         <legend>
                             Keying
                             <span></span>
@@ -198,7 +195,7 @@
                     </fieldset>
 
                     <!-- OUTPUT -->
-                    <fieldset class="flex flex-col gap-3 border-b pb-8" collapsable>
+                    <fieldset class="flex flex-col gap-3 border-b pb-8" closed="true" collapsable>
                         <legend>
                             Output
                             <span></span>

@@ -14,7 +14,7 @@
             </a>
 
             <div class="flex items-center gap-2">
-                <a href="/" class="btn-secondary-sm">New Project</a>
+                <a href="/" class="btn-secondary-sm" id="new-project">New Project</a>
                 <button class="btn-primary-sm">Run Interference</button>
             </div>
         </header>
@@ -28,15 +28,20 @@
                     <ul class="space-y-1" id="projects-list">
                         <li class="selected">Project 1</li>
                     </ul>
+                    <a href="/">
+                        <ul class="group mt-1 px-2 py-1.5 rounded hover:bg-zinc-800 border border-dashed transition-colors" id="new-project">
+                            <li class="flex gap-1">
+                                New Project
+                                <img class="opacity-0 transition-opacity group-hover:opacity-100" src="/static/images/plus.svg" />
+                            </li>
+                        </ul>
+                    </a>
                 </div>
 
                 <div class="pb-4 border-b">
                     <h2 class="text-xs uppercase text-zinc-400 mb-2">Queue</h2>
                     <ul class="space-y-1">
                         <li class="px-2 py-1 rounded hover:bg-zinc-800">empty</li>
-                        <!-- <li class="px-2 py-1 rounded bg-corridor-blue text-black">greenscreen_take_01.mp4</li>
-                        <li class="px-2 py-1 rounded hover:bg-zinc-800">greenscreen_take_02.mp4</li>
-                        <li class="px-2 py-1 rounded hover:bg-zinc-800">pickup_shot.mov</li> -->
                     </ul>
                 </div>
 

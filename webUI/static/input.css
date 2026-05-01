@@ -148,7 +148,7 @@ fieldset[collapsable][closed]>:not(legend) {
 /* Projects and Exports list */
 ul#projects-list>li:not(.selected),
 ul#exports-list>li:not(.selected) {
-    @apply px-2 py-1 rounded hover:bg-zinc-800;
+    @apply px-2 py-1.5 rounded hover:bg-zinc-800;
 }
 
 ul#exports-list>li {
@@ -156,7 +156,7 @@ ul#exports-list>li {
 }
 
 li.selected {
-    @apply px-2 py-1 rounded bg-corridor-blue text-black bg-clip-padding;
+    @apply px-2 py-1.5 rounded bg-corridor-blue text-black bg-clip-padding;
 }
 
 div#export-actions {

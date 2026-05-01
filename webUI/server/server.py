@@ -24,6 +24,10 @@ from backend.ffmpeg_tools import find_ffmpeg, stitch_video
 import device_utils
 import clip_manager
 
+# Add these imports for inference
+from clip_manager import run_inference, scan_clips, InferenceSettings
+from device_utils import resolve_device
+
 # Project root
 ROOT = Path(__file__).resolve().parent.parent 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent / "projects"
@@ -54,7 +58,14 @@ def health():
 def gpus():
     gpus = device_utils.enumerate_gpus()
     return [asdict(gpu) for gpu in gpus]
- 
+
+@app.get("/api/projects")
+def list_projects():
+    # get projects (names)
+    projects = [p.name for p in PROJECT_ROOT.iterdir() if p.is_dir()]
+
+    return projects
+
 @app.get("/api/projectInfo")
 def project_info(project: str):
     # get projects (names)
@@ -207,6 +218,66 @@ def update_json(payload: dict):
     print(f"Updated project {project}.")
 
     return {"status": f"Options saved for project {project}"}
+
+@app.post("/api/runInterference")
+def run_interference(project: str):
+    if not project:
+        raise HTTPException(status_code=400, detail="Project required")
+
+    project_dir = PROJECT_ROOT / project
+    if not project_dir.is_dir():
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    # Load options
+    options_path = project_dir / ".corridorkey_session.json"
+    if not options_path.is_file():
+        raise HTTPException(status_code=404, detail="Options not found")
+
+    with open(options_path, "r") as file:
+        options = json.load(file)
+
+    # Map options to InferenceSettings
+    params = options.get("params", {})
+    settings = InferenceSettings(
+        input_is_linear=params.get("input_is_linear", True),
+        despill_strength=float(params.get("despill_strength", 0.5)),
+        auto_despeckle=params.get("auto_despeckle", True),
+        despeckle_size=int(params.get("despeckle_size", 400)),
+        refiner_scale=float(params.get("refiner_scale", 1.0)),
+        generate_comp=options.get("output_config", {}).get("comp_enabled", True),
+        gpu_post_processing=True,  # Default, or from options
+        image_size=2048,  # Default
+        tiled_inference=False,  # Default
+    )
+
+    # Scan clips and find the matching one
+    clips = scan_clips()
+    target_clip = next((clip for clip in clips if clip.name == project), None)
+    if not target_clip:
+        raise HTTPException(status_code=404, detail="Clip not found in ClipsForInference")
+
+    # Run inference in background thread
+    thread = Thread(
+        target=_run_inference_worker,
+        args=(target_clip, settings),
+        daemon=True
+    )
+    thread.start()
+
+    return {"status": "Inference started"}
+
+def _run_inference_worker(clip, settings):
+    try:
+        device = resolve_device("auto")
+        run_inference(
+            [clip],
+            device=device,
+            backend="auto",
+            settings=settings,
+        )
+        print(f"Inference completed for {clip.name}")
+    except Exception as e:
+        print(f"Inference failed for {clip.name}: {e}")
 
 # -------------------
 # Media files

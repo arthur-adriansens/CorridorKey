@@ -12,7 +12,7 @@ let videoDuration,
     previousFrame = 0;
 let dragging = false;
 
-let current_view = document.querySelector("#views > .btn-primary-sm").textContent;
+let current_view = document.querySelector("#views > .btn-primary-sm")?.textContent;
 const PROJECT_NAME = "260415_191034_Input";
 
 /* 1. SERVER CONNECTION */
@@ -89,6 +89,38 @@ const intervalID2 = setInterval(update_gpu_status, 3 * 1000);
 
 // Todo: naast status: "- Uploading... <loading bar>" als iets aan het fetchen
 // custom fetch misschien?
+
+// Get list of projects
+if (!window.location.href.includes("/project")) list_projects();
+
+async function list_projects() {
+    const response = await fetch("/api/projects");
+
+    if (!response.ok) {
+        console.log("Unable to fetch projects.");
+        return;
+    }
+
+    const projects = await response.json();
+
+    // Update projects list UI
+    if (projects?.length > 0) {
+        const projectsList = document.getElementById("projects-list");
+        projectsList.innerHTML = "";
+
+        projects.forEach((project) => {
+            const link = document.createElement("a");
+            link.href = `/project?name=${project}`;
+
+            const li = document.createElement("li");
+            li.textContent = project;
+            if (project === PROJECT_NAME && window.location.href.includes("/project")) li.classList.add("selected");
+
+            link.append(li);
+            projectsList.append(link);
+        });
+    }
+}
 
 /* 2. DYNAMIC UI */
 
@@ -347,7 +379,6 @@ const fileInput = document.getElementById("folder-input");
 
 if (dropZone && fileInput) {
     const previewContainer = dropZone.querySelector("div#preview");
-
     // Prevent browser defaults
     ["dragenter", "dragover", "dragleave", "drop"].forEach((event) => {
         dropZone.addEventListener(event, (e) => {
@@ -390,6 +421,7 @@ function handleFiles(files) {
     const url = URL.createObjectURL(file);
 
     // Clear previous preview
+    const previewContainer = dropZone.querySelector("div#preview");
     previewContainer.innerHTML = "";
 
     // VIDEO PREVIEW
@@ -516,6 +548,7 @@ function onFrameChange(frameIndex) {
 
 function playPauseSetup() {
     playPauseButton = document.getElementById("playPause");
+    if (!playPauseButton) return;
 
     playPauseButton.addEventListener("click", () => {
         if (videoEl.paused) {
