@@ -161,7 +161,7 @@ li.selected {
 }
 
 div#export-actions {
-    @apply opacity-0 transition-opacity pointer-events-none;
+    @apply opacity-0 transition-opacity pointer-events-none select-none;
 }
 
 div:has(>ul#exports-list>li.selected)>div#export-actions {

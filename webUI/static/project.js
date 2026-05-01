@@ -133,7 +133,7 @@ function update_view() {
 
         for (let video of exportsList.children) {
             if (video?.textContent?.includes(current_view)) {
-                video.classList.add("selected");
+                select_export(video);
                 break;
             }
         }
@@ -279,7 +279,8 @@ async function generate_export(custom_view) {
         <p class="text-zinc-400 text-sm">Starting export…</p>
     `;
 
-    id = 1;
+    id = Object.keys(queue).length + 1;
+    queue[id] = { name: "Exporting", percent: 0 };
 
     // Update Queue UI list
     const update_queue_ui = () => {
@@ -312,8 +313,7 @@ async function generate_export(custom_view) {
 
         // Update text in preview window
         if (data.stage === "converting_exr_to_png") {
-            id = Object.keys(queue).length + 1;
-            queue[id] = { name: "Exporting", percent: 0 };
+            queue[id] = { name: "Exporting", percent: data.percent };
 
             generation_progress.innerHTML = `
                 <p class="text-zinc-200 font-semibold">Generating Export</p>

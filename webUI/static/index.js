@@ -276,12 +276,11 @@ function select_export(target) {
                 method: "POST",
             });
 
+            const data = await response.json();
             if (!response.ok) {
-                console.log("Unable to remove export.");
+                console.log("Unable to remove export.", data);
                 return;
             }
-
-            const data = await response.json();
 
             if (target?.parentNode?.children?.length === 1) {
                 target.parentNode.innerHTML = "<li>no exports</li>";

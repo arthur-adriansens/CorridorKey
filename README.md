@@ -23,6 +23,7 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
 - [ ] Move original clip in UI to a underlying layer to implement "hold" compare mode
 - [ ] A/B compare mode?
 - [ x ] Add a working queue with progress bar as background
+- [ ] Add explenation to views
 
 ## Developer notes
 
