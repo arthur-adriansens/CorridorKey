@@ -15,7 +15,7 @@
 
             <div class="flex items-center gap-2">
                 <a href="/" class="btn-secondary-sm" id="new-project">New Project</a>
-                <button class="btn-primary-sm">Run Interference</button>
+                <button class="btn-primary-sm" id="run">Run Inference</button>
             </div>
         </header>
 
@@ -25,12 +25,12 @@
             <aside class="p-3 text-sm relative h-full overflow-y-auto overflow-x-hidden space-y-4" id="left">
                 <div class="pb-4 border-b">
                     <h2 class="text-xs uppercase text-zinc-400 mb-2">Projects</h2>
-                    <ul class="space-y-1" id="projects-list">
+                    <ul class="flex flex-col gap-1" id="projects-list">
                         <li class="selected">Project 1</li>
                     </ul>
                     <a href="/">
                         <ul class="group mt-1 px-2 py-1.5 rounded hover:bg-zinc-800 border border-dashed transition-colors" id="new-project">
-                            <li class="flex gap-1">
+                            <li class="flex gap-1 justify-between">
                                 New Project
                                 <img class="opacity-0 transition-opacity group-hover:opacity-100" src="/static/images/plus.svg" />
                             </li>
@@ -40,8 +40,8 @@
 
                 <div class="pb-4 border-b">
                     <h2 class="text-xs uppercase text-zinc-400 mb-2">Queue</h2>
-                    <ul class="space-y-1">
-                        <li class="px-2 py-1 rounded hover:bg-zinc-800">empty</li>
+                    <ul class="space-y-1" id="queue">
+                        <li data-id="0">Empty</li>
                     </ul>
                 </div>
 
@@ -227,7 +227,7 @@
                     <!-- KEYING -->
                     <fieldset class="flex flex-col gap-5 border-b pb-8" id="dynamic-labels" id="interference-options" collapsable>
                         <legend>
-                            Interference options
+                            Inference options
                             <span></span>
                         </legend>
 

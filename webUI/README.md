@@ -1,8 +1,10 @@
 # CorridorKey web UI
 
-Hi! This web UI was made by Arthur Adriansens. I stepped out of my comfort zone from JavaScript, Node.js, and Astro to use Python. This UI version does not use any pip Python libraries, only the standard library.
+Hi! This web UI was made by Arthur Adriansens. I stepped out of my comfort zone (JavaScript, Node.js and Astro) to use Python. The backend uses standard library, together with the already installed packages from CorridorKey, plus fastapi.
 
-I wanted to avoid adding any packages to this awesome project, so I only used devDependencies, because I want to use Tailwind CSS for faster development and maintainability.
+I wanted to avoid adding any JavaScript packages to this awesome project, so I only used devDependencies (no package.json needed), because I want to use Tailwind CSS for faster development and maintainability.
+
+![UI screenshot](./static/images/screenshot.png "UI screenshot")
 
 ## Developer notes
 
@@ -13,14 +15,14 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
 
 ### Install
 
-To clone the entire project:
+Download the entire project:
 
 ```bash
 git clone https://github.com/nikopueringer/CorridorKey.git
 cd CorridorKey
 ```
 
-Install the Python development dependencies:
+Install the Python dependencies:
 
 ```bash
 uv sync --group dev
@@ -29,7 +31,7 @@ uv sync --group dev
 Start the Python server:
 
 ```bash
-uv run uvicorn webUI.server.server:app --reload
+uv run --extra cuda uvicorn webUI.server.server:app --reload
 ```
 
 ## FFmpeg
@@ -37,6 +39,7 @@ uv run uvicorn webUI.server.server:app --reload
 FFmpeg also needs to be installed.
 
 Download FFmpeg here: [ffmpeg.org/download.html](https://ffmpeg.org/download.html)
+Or:
 
 ### Windows
 

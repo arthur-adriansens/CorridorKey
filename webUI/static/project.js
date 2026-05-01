@@ -39,11 +39,15 @@ async function load_project() {
         projectsList.innerHTML = "";
 
         projectData.projects.forEach((project) => {
+            const link = document.createElement("a");
+            link.href = `/project?name=${project}`;
+
             const li = document.createElement("li");
             li.textContent = project;
-            if (project === PROJECT_NAME) li.classList.add("selected");
+            if (project === PROJECT_NAME && window.location.href.includes("/project")) li.classList.add("selected");
 
-            projectsList.append(li);
+            link.append(li);
+            projectsList.append(link);
         });
     }
 
@@ -82,17 +86,15 @@ async function load_project() {
             updateDynamicLabel(input);
         }
 
-        // for (let option)
-
         document.getElementById("live_preview").checked = projectData.options.live_preview;
     }
-
-    update_view();
 
     // Update exports list UI
     if (projectData?.exports) {
         update_exports_list();
     }
+
+    update_view();
 }
 
 const exportsList = document.getElementById("exports-list");
@@ -265,6 +267,8 @@ function create_image_element(src) {
 }
 
 const generation_progress = document.getElementById("generate-progress");
+const queue_ul = document.getElementById("queue");
+const empty_queue = queue_ul.children[0];
 
 async function generate_export(custom_view) {
     generation_progress.classList.remove("hidden");
@@ -275,25 +279,57 @@ async function generate_export(custom_view) {
         <p class="text-zinc-400 text-sm">Starting export…</p>
     `;
 
+    id = 1;
+
+    // Update Queue UI list
+    const update_queue_ui = () => {
+        let list_item = queue_ul.querySelector(`[data-id="${id}"]`);
+        if (!queue?.[id]) {
+            if (list_item) {
+                list_item.style.background = `#029ad4`;
+                list_item.remove();
+            }
+            empty_queue.style.display = "block";
+            return;
+        }
+
+        if (!list_item) {
+            list_item = document.createElement("li");
+            list_item.textContent = queue[id].name;
+            list_item.dataset.id = id;
+            queue_ul.append(list_item);
+            empty_queue.style.display = "none";
+        }
+
+        list_item.style.backgroundImage = `linear-gradient(to right, #029ad4 ${queue[id].percent}%, transparent ${queue[id].percent}%)`;
+    };
+
     await fetch(`/api/generateExport?project=${PROJECT_NAME}&export_type=${custom_view || current_view}&fps=${fps || 30}`, { method: "POST" });
 
     async function poll() {
         const res = await fetch("/api/exportProgress");
         const data = await res.json();
 
+        // Update text in preview window
         if (data.stage === "converting_exr_to_png") {
+            id = Object.keys(queue).length + 1;
+            queue[id] = { name: "Exporting", percent: 0 };
+
             generation_progress.innerHTML = `
                 <p class="text-zinc-200 font-semibold">Generating Export</p>
                 <p class="text-zinc-400 text-sm">Converting EXR frames to PNG</p>
                 <p class="text-zinc-500 text-xs">${data.current} / ${data.total} (${data.percent}%)</p>
             `;
         } else if (data.stage === "stitching_video") {
+            queue[id] = { name: "Exporting", percent: data.percent };
             generation_progress.innerHTML = `
                 <p class="text-zinc-200 font-semibold">Generating Export</p>
                 <p class="text-zinc-400 text-sm">Stitching frames into video</p>
                 <p class="text-zinc-500 text-xs">${data.current} / ${data.total} (${data.percent}%)</p>
             `;
         } else if (data.stage === "done") {
+            delete queue[id];
+
             generation_progress.innerHTML = `
                 <p class="text-green-400 font-semibold">Export Complete</p>
                 <p class="text-zinc-400 text-sm">Video is ready!</p>
@@ -301,6 +337,7 @@ async function generate_export(custom_view) {
 
             video_viewer(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`);
             load_project();
+            update_queue_ui();
             return;
         } else if (data.stage === "error") {
             generation_progress.innerHTML = `
@@ -309,6 +346,8 @@ async function generate_export(custom_view) {
             `;
             return;
         }
+
+        update_queue_ui();
 
         setTimeout(poll, 500);
     }
@@ -416,15 +455,23 @@ const setKey = (obj, key, value) =>
     obj && typeof obj === "object" ? (key in obj ? ((obj[key] = value), true) : Object.values(obj).some((v) => setKey(v, key, value))) : false;
 
 // Run interference button
+document.getElementById("run").onclick = run_interference;
+
 async function run_interference() {
-    const params = new URLSearchParams({
-        project: PROJECT_NAME,
+    const response = await fetch("/api/runInterference", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            project: PROJECT_NAME,
+        }),
     });
-    const response = await fetch(`/api/runInterference?${params}`);
 
     if (!response.ok) {
         const message = await response.json();
         console.log("Unable to fetch project. Error:", message.detail);
         return;
     }
+
+    body = await response.json();
+    console.log(body);
 }

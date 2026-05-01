@@ -795,6 +795,10 @@ video {
   justify-content: space-between;
 }
 
+.gap-1 {
+  gap: 0.25rem;
+}
+
 .gap-1\.5 {
   gap: 0.375rem;
 }
@@ -809,10 +813,6 @@ video {
 
 .gap-5 {
   gap: 1.25rem;
-}
-
-.gap-1 {
-  gap: 0.25rem;
 }
 
 .space-y-1 > :not([hidden]) ~ :not([hidden]) {
@@ -908,11 +908,6 @@ video {
 .bg-corridor-bg {
   --tw-bg-opacity: 1;
   background-color: rgb(20 19 0 / var(--tw-bg-opacity, 1));
-}
-
-.bg-corridor-blue {
-  --tw-bg-opacity: 1;
-  background-color: rgb(2 154 212 / var(--tw-bg-opacity, 1));
 }
 
 .bg-corridor-border {
@@ -1051,11 +1046,6 @@ video {
 
 .\!text-warning {
   color: #ec942cff !important;
-}
-
-.text-black {
-  --tw-text-opacity: 1;
-  color: rgb(0 0 0 / var(--tw-text-opacity, 1));
 }
 
 .text-corridor-yellow {
@@ -1468,8 +1458,9 @@ fieldset[collapsable][closed]>:not(legend) {
 
 /* Projects and Exports list */
 
-ul#projects-list>li:not(.selected),
-ul#exports-list>li:not(.selected) {
+ul#projects-list li:not(.selected),
+ul#exports-list>li:not(.selected),
+ul#queue>li {
   border-radius: 0.25rem;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -1477,8 +1468,9 @@ ul#exports-list>li:not(.selected) {
   padding-bottom: 0.375rem;
 }
 
-ul#projects-list>li:not(.selected):hover,
-ul#exports-list>li:not(.selected):hover {
+ul#projects-list li:not(.selected):hover,
+ul#exports-list>li:not(.selected):hover,
+ul#queue>li:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
 }

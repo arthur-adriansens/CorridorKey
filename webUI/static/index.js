@@ -13,7 +13,15 @@ let videoDuration,
 let dragging = false;
 
 let current_view = document.querySelector("#views > .btn-primary-sm")?.textContent;
-const PROJECT_NAME = "260415_191034_Input";
+
+// Get project name from url
+const url_string = new URL(window.location.href);
+const PROJECT_NAME = url_string.searchParams.get("name");
+console.log(PROJECT_NAME);
+// const PROJECT_NAME = "testing";
+// const PROJECT_NAME = "260415_191034_Input";
+
+const queue = {};
 
 /* 1. SERVER CONNECTION */
 
@@ -75,7 +83,7 @@ function updateVRAMBar(gpuInfo) {
 
     gpu_vram_info.textContent = `${usedGB.toFixed(2)} / ${gpuInfo.vram_total_gb.toFixed(2)}`;
 
-    if (percent > 85) {
+    if (percent > 75) {
         gpu_vram_bar.classList.add("danger");
     } else {
         gpu_vram_bar.classList.remove("danger");
@@ -246,7 +254,7 @@ function select_export(target) {
         // Open video export file location
         const regenerate_btn = exportActions.querySelector("button#export-regenerate");
         regenerate_btn.onclick = async () => {
-            console.log("Regenerating Video export for this view.");
+            console.log("Regenerating Video export for this view. Starting generation...");
             const success = generate_export(target.textContent?.includes("Alpha") ? "AlphaHint" : undefined);
 
             if (!success) {

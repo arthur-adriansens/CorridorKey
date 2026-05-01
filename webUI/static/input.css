@@ -146,8 +146,9 @@ fieldset[collapsable][closed]>:not(legend) {
 }
 
 /* Projects and Exports list */
-ul#projects-list>li:not(.selected),
-ul#exports-list>li:not(.selected) {
+ul#projects-list li:not(.selected),
+ul#exports-list>li:not(.selected),
+ul#queue>li {
     @apply px-2 py-1.5 rounded hover:bg-zinc-800;
 }
 

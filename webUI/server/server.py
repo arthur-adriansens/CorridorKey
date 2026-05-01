@@ -11,6 +11,7 @@ import platform
 import json
 import sys
 import os
+import re
 
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../..")))
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" # enable exr support by cv2
@@ -25,7 +26,7 @@ import device_utils
 import clip_manager
 
 # Add these imports for inference
-from clip_manager import run_inference, scan_clips, InferenceSettings
+from clip_manager import ClipAsset, ClipEntry, InferenceSettings, run_inference
 from device_utils import resolve_device
 
 # Project root
@@ -42,6 +43,17 @@ EXPORT_PROGRESS = {
 }
 
 PROGRESS_LOCK = Lock()
+
+# Inference tracking
+INFERENCE_PROGRESS = {
+    "stage": "idle",
+    "message": "",
+    "current": 0,
+    "total": 0,
+    "percent": 0,
+}
+
+INFERENCE_LOCK = Lock()
 
 app = FastAPI() 
 print("\nServer started! Only (critical) errors and warnings will show up here.")
@@ -88,6 +100,7 @@ def project_info(project: str):
 
     # get exports
     exports_path = (PROJECT_ROOT / project / "clips/Input/_EXPORTS")
+    exports = {}
     if exports_path.is_dir():
         exports = {export.name: export for export in exports_path.iterdir() if export.is_file()}
 
@@ -138,12 +151,12 @@ def generate_export(project: str, export_type: str, fps: int):
     
     # Launch export in a persistent background thread.
 
-    thread = Thread(
+    thread_exporting = Thread(
         target=_generate_export_worker,
         args=(project, export_type, fps),
         daemon=True
     )
-    thread.start()
+    thread_exporting.start()
 
     return {"status": "started"}
 
@@ -219,8 +232,16 @@ def update_json(payload: dict):
 
     return {"status": f"Options saved for project {project}"}
 
+# import torch
+# print(torch.__version__)
+# print("cuda available:", torch.cuda.is_available())
+# print("cuda devices:", torch.cuda.device_count())
+# print("cuda version:", torch.version.cuda)
+
 @app.post("/api/runInterference")
-def run_interference(project: str):
+def run_interference(payload: dict):
+    project = payload.get("project")
+
     if not project:
         raise HTTPException(status_code=400, detail="Project required")
 
@@ -233,7 +254,7 @@ def run_interference(project: str):
     if not options_path.is_file():
         raise HTTPException(status_code=404, detail="Options not found")
 
-    with open(options_path, "r") as file:
+    with open(options_path, "r", encoding="utf-8") as file:
         options = json.load(file)
 
     # Map options to InferenceSettings
@@ -245,26 +266,69 @@ def run_interference(project: str):
         despeckle_size=int(params.get("despeckle_size", 400)),
         refiner_scale=float(params.get("refiner_scale", 1.0)),
         generate_comp=options.get("output_config", {}).get("comp_enabled", True),
-        gpu_post_processing=True,  # Default, or from options
-        image_size=2048,  # Default
-        tiled_inference=False,  # Default
+        gpu_post_processing=False,
+        image_size=options.get("image_size", 2048),
+        tiled_inference=options.get("tiled_inference", False),
     )
 
-    # Scan clips and find the matching one
-    clips = scan_clips()
-    target_clip = next((clip for clip in clips if clip.name == project), None)
-    if not target_clip:
-        raise HTTPException(status_code=404, detail="Clip not found in ClipsForInference")
+    # Build the clip from the webUI project path, not from ClipsForInference
+    clip_root = project_dir / "clips" / "Input"
+    if not clip_root.is_dir():
+        raise HTTPException(status_code=404, detail="Clip root not found")
+
+    source_dir = clip_root / "Source"
+    if not source_dir.is_dir():
+        raise HTTPException(status_code=404, detail="Source directory not found")
+
+    input_candidates = [p for p in source_dir.iterdir() if p.is_file() and p.suffix.lower() in (".mp4", ".mov", ".avi", ".mkv")]
+    if not input_candidates:
+        raise HTTPException(status_code=404, detail="Input source video not found")
+
+    clip = ClipEntry(project, str(clip_root))
+    clip.input_asset = ClipAsset(str(input_candidates[0]), "video")
+
+    alpha_dir = clip_root / "AlphaHint"
+    if alpha_dir.is_dir():
+        clip.alpha_asset = ClipAsset(str(alpha_dir), "sequence")
+    else:
+        clip.alpha_asset = None
+
+    if clip.alpha_asset is None:
+        raise HTTPException(status_code=404, detail="AlphaHint not found for clip")
 
     # Run inference in background thread
     thread = Thread(
         target=_run_inference_worker,
-        args=(target_clip, settings),
-        daemon=True
+        args=(clip, settings),
+        daemon=True,
     )
     thread.start()
 
     return {"status": "Inference started"}
+
+def on_clip_start(clip_name: str, total_frames: int):
+        with PROGRESS_LOCK:
+            print("Started!!!!", clip_name, total_frames)
+
+            # INFERENCE_PROGRESS.update({
+            #     "stage": "inference",
+            #     "clip": clip_name,
+            #     "message": "Inference started",
+            #     "current": 0,
+            #     "total": total_frames,
+            #     "percent": 0,
+            # })
+
+def on_frame_complete(current: int, total: int):
+    with PROGRESS_LOCK:
+        print("HI!!!!", current+1, total)
+        # INFERENCE_PROGRESS.update({
+        #     "stage": "inference",
+        #     "message": "Rendering frames",
+        #     "current": current + 1,
+        #     "total": total,
+        #     "percent": int((current + 1) / total * 100),
+        # })
 
 def _run_inference_worker(clip, settings):
     try:
@@ -274,6 +338,8 @@ def _run_inference_worker(clip, settings):
             device=device,
             backend="auto",
             settings=settings,
+            on_clip_start=on_clip_start,
+            on_frame_complete=on_frame_complete,
         )
         print(f"Inference completed for {clip.name}")
     except Exception as e:
@@ -384,8 +450,8 @@ def _generate_export_worker(project: str, export_type: str, fps: int):
         # Detect available frames
         # --------------------------------------------------
 
-        exr_frames = sorted(frames_path.glob("frame_*.exr"))
-        png_frames = sorted(frames_path.glob("frame_*.png"))
+        exr_frames = sorted(frames_path.glob("*.exr"))
+        png_frames = sorted(frames_path.glob("*.png"))
 
         if png_frames:
             source_type = "png"
@@ -452,7 +518,10 @@ def _generate_export_worker(project: str, export_type: str, fps: int):
         _set_progress("error", str(e), 0, 0)
 
 
-
+def infer_pattern(dir):
+    files = sorted(file for file in os.listdir(dir) if file.endswith(".png"))
+    match = re.match(r"^(.*?)(\d+)(\.[^.]+)$", files[0])
+    return f"{match.group(1)}%0{len(match.group(2))}d{match.group(3)}" if match else None
 
 def stitch_video_with_progress(
     frames_path: Path,
@@ -468,10 +537,12 @@ def stitch_video_with_progress(
             total_frames,
         )
 
+    pattern = infer_pattern(frames_path)
+
     stitch_video(
         in_dir=str(frames_path),
         out_path=str(output),
         fps=float(fps),
-        pattern="frame_%06d.png",   # IMPORTANT: PNG, not EXR
+        pattern = pattern,   # IMPORTANT: PNG, not EXR 
         on_progress=on_progress,
     )

@@ -3,6 +3,27 @@
 Hi! This web UI was made by Arthur Adriansens. I stepped out of my comfort zone (JavaScripe, Node.js and Astro) to use Python. This UI version doens't use any pip python libraries, only native.
 I wanted to avoid adding any packages to this awesome project, so I only used devDependencies, because I want to use Tailwind CSS for faster development and maintainability.
 
+## Todo's
+
+- [ ] Make interference work.
+    - [ x ] Bug where no clips are found (fixed with auto frame pattern detection)
+    - [ ] Color space (sRGB / linear)
+    - [ ] Add cuda check:
+        ```py
+        import torch
+        print(torch.__version__)
+        print("available:", torch.cuda.is_available()) #true?
+        print("cuda devices:", torch.cuda.device_count()) #>= 1?
+        print("cuda version:", torch.version.cuda)
+        ```
+    - [ ] Implement custom backend:
+        ```py
+        run_inference([clip], device=device, backend="auto" # here, ...)
+        ```
+- [ ] Move original clip in UI to a underlying layer to implement "hold" compare mode
+- [ ] A/B compare mode?
+- [ x ] Add a working queue with progress bar as background
+
 ## Developer notes
 
 ### Prerequisites
@@ -40,7 +61,7 @@ ffmpeg -version # test if installation was a succes
 Then start the local server:
 
 ```bash
-uv run uvicorn webUI.server.server:app --reload # start the python server (also for development)
+uv run --extra cuda uvicorn webUI.server.server:app --reload # start the python server (also for development)
 ```
 
 ### Dev setup
