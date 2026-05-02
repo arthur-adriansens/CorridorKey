@@ -6,6 +6,8 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
 ## Todo's
 
 - [ ] Make interference work.
+    - [ x ] Make it work (lol).
+    - [ x ] Connect progress and queue to UI
     - [ x ] Bug where no clips are found (fixed with auto frame pattern detection)
     - [ ] Color space (sRGB / linear)
     - [ ] Add cuda check:
@@ -26,6 +28,7 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
 - [ x ] Add explenation to views and compare modes
 - [ ] Clean the 2 README's up.
 - [ ] "Starting server" and "Project not found" page
+- [ ] Load queue when reloading UI page
 
 ## Developer notes
 

@@ -290,9 +290,36 @@ function create_video_element(src, isOriginal = false) {
     else videoEl = newVideo;
 }
 
-const generation_progress = document.getElementById("generate-progress");
+// Update Queue UI listµ
 const queue_ul = document.getElementById("queue");
 const empty_queue = queue_ul.children[0];
+
+const update_queue_ui = (queueID) => {
+    let list_item = queue_ul.querySelector(`[data-id="${queueID}"]`);
+    if (!queue?.[queueID]) {
+        if (list_item) {
+            list_item.style.background = `#029ad4`;
+            list_item.remove();
+        }
+        empty_queue.style.display = "block";
+        return;
+    }
+
+    if (!list_item) {
+        list_item = document.createElement("li");
+        list_item.textContent = queue[queueID].name;
+        list_item.dataset.id = queueID;
+        queue_ul.append(list_item);
+        empty_queue.style.display = "none";
+    }
+
+    list_item.textContent = queue[queueID].name;
+    list_item.style.backgroundImage = `linear-gradient(to right, #029ad4 ${queue[queueID].percent}%, transparent ${queue[queueID].percent}%)`;
+};
+
+// Generate export progress displayer
+
+const generation_progress = document.getElementById("generate-progress");
 
 async function generate_export(custom_view) {
     generation_progress.classList.remove("hidden");
@@ -305,29 +332,6 @@ async function generate_export(custom_view) {
 
     id = Object.keys(queue).length + 1;
     queue[id] = { name: "Exporting", percent: 0 };
-
-    // Update Queue UI list
-    const update_queue_ui = () => {
-        let list_item = queue_ul.querySelector(`[data-id="${id}"]`);
-        if (!queue?.[id]) {
-            if (list_item) {
-                list_item.style.background = `#029ad4`;
-                list_item.remove();
-            }
-            empty_queue.style.display = "block";
-            return;
-        }
-
-        if (!list_item) {
-            list_item = document.createElement("li");
-            list_item.textContent = queue[id].name;
-            list_item.dataset.id = id;
-            queue_ul.append(list_item);
-            empty_queue.style.display = "none";
-        }
-
-        list_item.style.backgroundImage = `linear-gradient(to right, #029ad4 ${queue[id].percent}%, transparent ${queue[id].percent}%)`;
-    };
 
     await fetch(`/api/generateExport?project=${PROJECT_NAME}&export_type=${custom_view || current_view}&fps=${fps || 30}`, { method: "POST" });
 
@@ -361,13 +365,16 @@ async function generate_export(custom_view) {
 
             video_viewer(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`);
             load_project();
-            update_queue_ui();
+            update_queue_ui(id);
             return;
         } else if (data.stage === "error") {
             generation_progress.innerHTML = `
                 <p class="text-red-500 font-semibold">Export Failed</p>
                 <p class="text-zinc-400 text-sm">${data.message}</p>
             `;
+
+            delete queue[id];
+            update_queue_ui(id);
             return;
         }
 
@@ -378,6 +385,85 @@ async function generate_export(custom_view) {
 
     poll();
 }
+
+// Run inference progress displayer
+
+const inference_progress = document.getElementById("inference-progress");
+
+async function run_interference(custom_view) {
+    inference_progress.classList.remove("hidden");
+    previewContainer.classList.add("hidden");
+
+    inference_progress.innerHTML = `
+        <p class="text-zinc-200 font-semibold">Starting Inference</p>
+        <p class="text-zinc-400 text-sm">Warming up server…</p>
+    `;
+
+    id = Object.keys(queue).length + 1;
+    queue[id] = { name: "Setting Up", percent: 0 };
+
+    await fetch("/api/runInterference", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            project: PROJECT_NAME,
+        }),
+    });
+
+    async function poll() {
+        const res = await fetch("/api/inferenceProgress");
+        const data = await res.json();
+        console.log(data);
+
+        // Update text in preview window
+        if (data.stage === "setup") {
+            queue[id] = { name: "Setting Up", percent: data.percent };
+
+            inference_progress.innerHTML = `
+                <p class="text-zinc-200 font-semibold">Running Inference Setup</p>
+                <p class="text-zinc-400 text-sm">${data.message}</p>
+                <p class="text-zinc-500 text-xs">${data.current} / ${data.total} (${data.percent}%)</p>
+            `;
+        } else if (data.stage === "inference") {
+            queue[id] = { name: "Running", percent: data.percent };
+            inference_progress.innerHTML = `
+                <p class="text-zinc-200 font-semibold">Running Inference</p>
+                <p class="text-zinc-400 text-sm">${data.message}</p>
+                <p class="text-zinc-500 text-xs">${data.current} / ${data.total} (${data.percent}%)</p>
+            `;
+        } else if (data.stage === "done") {
+            delete queue[id];
+
+            inference_progress.innerHTML = `
+                <p class="text-green-400 font-semibold">Export Complete</p>
+                <p class="text-zinc-400 text-sm">Frames are keyed!</p>
+            `;
+
+            // video_viewer(`/media/${PROJECT_NAME}/clips/Input/_EXPORTS/Input_${current_view}_export.mp4`);
+            load_project();
+            update_queue_ui(id);
+            return;
+        } else if (data.stage === "error") {
+            inference_progress.innerHTML = `
+                <p class="text-red-500 font-semibold">Inference Failed</p>
+                <p class="text-zinc-400 text-sm">${data.message}</p>
+            `;
+
+            delete queue[id];
+            update_queue_ui(id);
+            return;
+        }
+
+        update_queue_ui(id);
+
+        setTimeout(poll, 500);
+    }
+
+    poll();
+}
+
+// Run interference button
+document.getElementById("run").onclick = run_interference;
 
 function count_frames(video) {
     let frameCount = 0;
@@ -477,25 +563,3 @@ const findKey = (obj, key) =>
 
 const setKey = (obj, key, value) =>
     obj && typeof obj === "object" ? (key in obj ? ((obj[key] = value), true) : Object.values(obj).some((v) => setKey(v, key, value))) : false;
-
-// Run interference button
-document.getElementById("run").onclick = run_interference;
-
-async function run_interference() {
-    const response = await fetch("/api/runInterference", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            project: PROJECT_NAME,
-        }),
-    });
-
-    if (!response.ok) {
-        const message = await response.json();
-        console.log("Unable to fetch project. Error:", message.detail);
-        return;
-    }
-
-    body = await response.json();
-    console.log(body);
-}

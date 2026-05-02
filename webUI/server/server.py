@@ -39,6 +39,7 @@ PROGRESS_LOCK = Lock()
 # Inference tracking
 INFERENCE_PROGRESS = {
     "stage": "idle",
+    "clip": "",
     "message": "",
     "current": 0,
     "total": 0,
@@ -157,6 +158,10 @@ def export_progress():
     with PROGRESS_LOCK:
         return EXPORT_PROGRESS.copy()
 
+@app.get("/api/inferenceProgress")
+def inference_progress():
+    with INFERENCE_LOCK:
+        return INFERENCE_PROGRESS.copy()
 
 @app.get("/api/showInExplorer/{path:path}")
 def show_in_explorer(path: str):
@@ -232,18 +237,25 @@ def update_json(payload: dict):
 
 @app.post("/api/runInterference")
 def run_interference(payload: dict):
+    _set_inference("setup", "Running inference checks", 0, 100)
+
     project = payload.get("project")
 
     if not project:
+        _set_inference("error", "Project required", 0, 0)
         raise HTTPException(status_code=400, detail="Project required")
 
     project_dir = PROJECT_ROOT / project
     if not project_dir.is_dir():
+        _set_inference("error", "Project not found", 0, 0)
         raise HTTPException(status_code=404, detail="Project not found")
 
     # Load options
+    _set_inference("setup", "Loading inference options", 25, 100)
+
     options_path = project_dir / ".corridorkey_session.json"
     if not options_path.is_file():
+        _set_inference("error", "Options not found", 0, 0)
         raise HTTPException(status_code=404, detail="Options not found")
 
     with open(options_path, "r", encoding="utf-8") as file:
@@ -263,22 +275,28 @@ def run_interference(payload: dict):
         tiled_inference=options.get("tiled_inference", False),
     )
 
+    _set_inference("setup", "Loading clips", 65, 100)
+
     # Build the clip from the webUI project path, not from ClipsForInference
     clip_root = project_dir / "clips" / "Input"
     if not clip_root.is_dir():
+        _set_inference("error", "Clip root not found", 0, 0)
         raise HTTPException(status_code=404, detail="Clip root not found")
 
     source_dir = clip_root / "Source"
     if not source_dir.is_dir():
+        _set_inference("error", "Source directory not found", 0, 0)
         raise HTTPException(status_code=404, detail="Source directory not found")
 
     input_candidates = [p for p in source_dir.iterdir() if p.is_file() and p.suffix.lower() in (".mp4", ".mov", ".avi", ".mkv")]
     if not input_candidates:
+        _set_inference("error", "Input source video not found", 0, 0)
         raise HTTPException(status_code=404, detail="Input source video not found")
 
     clip = ClipEntry(project, str(clip_root))
     clip.input_asset = ClipAsset(str(input_candidates[0]), "video")
 
+    _set_inference("setup", "Loading AlphaHint", 80, 100)
     alpha_dir = clip_root / "AlphaHint"
     if alpha_dir.is_dir():
         clip.alpha_asset = ClipAsset(str(alpha_dir), "sequence")
@@ -286,8 +304,11 @@ def run_interference(payload: dict):
         clip.alpha_asset = None
 
     if clip.alpha_asset is None:
+        _set_inference("error", "AlphaHint not found for clip", 0, 0)
         raise HTTPException(status_code=404, detail="AlphaHint not found for clip")
 
+    _set_inference("setup", "Setup complete!", 100, 100)
+    
     # Run inference in background thread
     thread = Thread(
         target=_run_inference_worker,
@@ -298,29 +319,13 @@ def run_interference(payload: dict):
 
     return {"status": "Inference started"}
 
+last_clip_name = ""
 def on_clip_start(clip_name: str, total_frames: int):
-        with PROGRESS_LOCK:
-            print("Started!!!!", clip_name, total_frames)
-
-            # INFERENCE_PROGRESS.update({
-            #     "stage": "inference",
-            #     "clip": clip_name,
-            #     "message": "Inference started",
-            #     "current": 0,
-            #     "total": total_frames,
-            #     "percent": 0,
-            # })
+    last_clip_name = clip_name
+    _set_inference("inference", "Inference started", 0, total_frames, clip_name)
 
 def on_frame_complete(current: int, total: int):
-    with PROGRESS_LOCK:
-        print("HI!!!!", current+1, total)
-        # INFERENCE_PROGRESS.update({
-        #     "stage": "inference",
-        #     "message": "Rendering frames",
-        #     "current": current + 1,
-        #     "total": total,
-        #     "percent": int((current + 1) / total * 100),
-        # })
+    _set_inference("inference", "Rendering frames", current+1, total)
 
 def _run_inference_worker(clip, settings):
     try:
@@ -333,9 +338,24 @@ def _run_inference_worker(clip, settings):
             on_clip_start=on_clip_start,
             on_frame_complete=on_frame_complete,
         )
+
+        _set_inference("done", "Export complete", 1, 1)
         print(f"Inference completed for {clip.name}")
+
     except Exception as e:
+        _set_inference("error", f"Inference failed for {clip.name}: {e}", 0, 0)
         print(f"Inference failed for {clip.name}: {e}")
+
+def _set_inference(stage, message="", current=0, total=0, clip_name=last_clip_name):
+    with INFERENCE_LOCK:
+        INFERENCE_PROGRESS.update({
+            "stage": stage,
+            "clip": clip_name,
+            "message": message,
+            "current": int(current),
+            "total": int(total),
+            "percent": int((current / total) * 100) if total > 0 else 0
+        })
 
 # -------------------
 # Media files

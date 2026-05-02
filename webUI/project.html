@@ -115,6 +115,14 @@
                             Video export hasn't been generated yet for this view. Stitching frames together to generate export...
                         </p>
                     </div>
+
+                    <div
+                        class="hidden w-full h-full border-2 border-dashed rounded flex flex-col gap-2 items-center justify-center transition-colors"
+                        id="inference-progress"
+                    >
+                        <p class="text-zinc-200 font-semibold text-center">Running Inference</p>
+                        <p class="text-zinc-400 text-sm text-center">Starting Inference...</p>
+                    </div>
                 </div>
 
                 <!-- FRAMES TRACK -->
