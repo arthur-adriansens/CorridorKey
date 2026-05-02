@@ -78,24 +78,32 @@
             <!-- CENTER PREVIEW -->
             <div class="flex flex-col overflow-x-auto">
                 <!-- VIEW TOOLBAR -->
-                <div class="flex items-center gap-2 px-3 py-2 border-b text-xs overflow-x-auto no-scrollbar" id="views" toggle-group>
-                    <p class="text-zinc-400">View</p>
-                    <button class="btn-primary-sm" data-explain="viewModes.input">Original</button>
-                    <button class="btn-secondary-sm" data-explain="viewModes.alpha">Alpha</button>
-                    <button class="btn-secondary-sm" data-explain="viewModes.mask" disabled>Mask</button>
-                    <button class="btn-secondary-sm" data-explain="viewModes.fg">FG</button>
-                    <button class="btn-secondary-sm" data-explain="viewModes.matte">Matte</button>
-                    <button class="btn-secondary-sm" data-explain="viewModes.comp">Comp</button>
-                    <button class="btn-secondary-sm" data-explain="viewModes.processed">Processed</button>
+                <div class="space-y-2 px-3 py-2 border-b text-xs overflow-x-auto no-scrollbar group">
+                    <div class="flex items-center gap-2" id="views" toggle-group>
+                        <p class="text-zinc-400">View</p>
+                        <button class="btn-primary-sm" data-explain="viewModes.input">Original</button>
+                        <button class="btn-secondary-sm" data-explain="viewModes.alpha">Alpha</button>
+                        <button class="btn-secondary-sm" data-explain="viewModes.mask" disabled>Mask</button>
+                        <button class="btn-secondary-sm" data-explain="viewModes.fg">FG</button>
+                        <button class="btn-secondary-sm" data-explain="viewModes.matte">Matte</button>
+                        <button class="btn-secondary-sm" data-explain="viewModes.comp">Comp</button>
+                        <button class="btn-secondary-sm" data-explain="viewModes.processed">Processed</button>
+                    </div>
+
+                    <div class="group-hover:flex items-center gap-2 hidden has-[.btn-primary-sm]:flex" id="compare-modes" toggle-group>
+                        <p class="text-zinc-400">Compare</p>
+                        <button class="btn-secondary-sm" data-explain="viewModes.input">Hold</button>
+                        <button class="btn-secondary-sm" data-explain="viewModes.alpha" disabled>A/B</button>
+                    </div>
                 </div>
 
                 <!-- PREVIEW CANVAS -->
                 <div class="flex-1 p-4 bg-corridor-dark">
                     <div
-                        class="w-full h-full border-2 border-dashed rounded flex flex-col gap-2 items-center justify-center text-zinc-500 transition-colors"
+                        class="w-full h-full border-2 border-dashed rounded flex flex-col gap-2 items-center justify-center text-zinc-500 transition-colors relative"
                         id="preview"
                     >
-                        <p>Preview</p>
+                        <p class="z-0 absolute">Preview</p>
                     </div>
 
                     <div

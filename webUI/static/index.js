@@ -5,7 +5,7 @@
     4. FRAME TRACK SELECTOR */
 
 // Global variables
-let fps, videoEl, imageEl, playPauseButton;
+let fps, videoEl, originalVideoEl, playPauseButton;
 let videoDuration,
     totalFrames,
     currentFrame,
@@ -203,17 +203,36 @@ document.addEventListener("mousemove", (e) => {
 
 // Toggle group (only select one button)
 
-const toggle_group = document.querySelector("div[toggle-group]");
+const toggle_group = document.querySelectorAll("div[toggle-group]");
 
-toggle_group.addEventListener("click", (e) => {
-    if (e.target.tagName !== "BUTTON") return;
+for (const group of toggle_group) {
+    group.addEventListener("click", (e) => {
+        if (e.target.tagName !== "BUTTON") return;
 
-    toggle_group.querySelector(".btn-primary-sm").classList.replace("btn-primary-sm", "btn-secondary-sm");
-    e.target.classList.replace("btn-secondary-sm", "btn-primary-sm");
+        if (e.target.closest("#compare-modes") && group.querySelector(".btn-primary-sm") == e.target) {
+            e.target.classList.replace("btn-primary-sm", "btn-secondary-sm"); // Allow to de-select button
+            update_compare_mode(group);
+            return;
+        }
 
-    current_view = e.target.textContent;
-    update_view();
-});
+        if (!group.querySelector(".btn-primary-sm")) {
+            e.target.classList.add("btn-primary-sm");
+        }
+
+        group.querySelector(".btn-primary-sm").classList.replace("btn-primary-sm", "btn-secondary-sm");
+        e.target.classList.replace("btn-secondary-sm", "btn-primary-sm");
+
+        if (e.target.closest("#views")) {
+            current_view = e.target.textContent;
+            update_view();
+            return;
+        }
+
+        if (e.target.closest("#compare-modes")) {
+            update_compare_mode(group);
+        }
+    });
+}
 
 // Collapsable fieldsets
 
@@ -490,22 +509,6 @@ track.addEventListener("click", (e) => {
 });
 
 function updateFromEvent(e, progressFromVideo, currentTimeFromVideo) {
-    if (e === undefined && (current_view == "Alpha" || current_view == "Matte")) {
-        currentFrame = Math.round((progressFromVideo / 100) * totalFrames);
-        updateUI(`${progressFromVideo}%`, currentTimeFromVideo);
-
-        let frameString = currentFrame.toString().padStart(6, "0");
-
-        if (!imageEl) return;
-
-        if (current_view == "Alpha") {
-            imageEl.src = `/media/${PROJECT_NAME}/clips/Input/AlphaHint/frame_${frameString}.png`;
-        } else {
-            imageEl.src = `/media/${PROJECT_NAME}/clips/Input/Output/Matte/frame_${frameString}.png`;
-        }
-        return;
-    }
-
     if (progressFromVideo !== undefined) {
         currentFrame = Math.round((progressFromVideo / 100) * (totalFrames + 1));
         updateUI(`${progressFromVideo}%`, currentTimeFromVideo);
@@ -541,15 +544,22 @@ function buildTicks(count) {
     }
 }
 
+let timeStamp = 0;
+
 function onFrameChange(frameIndex) {
-    if (frameIndex === previousFrame || frameIndex === undefined || !videoEl || !fps) return;
+    if (frameIndex === previousFrame || frameIndex === undefined || !originalVideoEl || !fps) return;
 
-    const timeStamp = frameIndex / fps;
+    timeStamp = frameIndex / fps;
 
-    videoEl.pause();
+    originalVideoEl.pause();
+    originalVideoEl.currentTime = timeStamp;
+
+    if (videoEl) {
+        videoEl.pause();
+        videoEl.currentTime = timeStamp;
+    }
+
     if (playPauseButton) playPauseButton.dataset.playing = "false";
-
-    videoEl.currentTime = timeStamp;
     previousFrame = frameIndex;
 }
 
@@ -558,11 +568,13 @@ function playPauseSetup() {
     if (!playPauseButton) return;
 
     playPauseButton.addEventListener("click", () => {
-        if (videoEl.paused) {
-            videoEl.play();
+        if (originalVideoEl.paused) {
+            videoEl?.play();
+            originalVideoEl.play();
             playPauseButton.dataset.playing = "true";
         } else {
-            videoEl.pause();
+            videoEl?.pause();
+            originalVideoEl?.pause();
             playPauseButton.dataset.playing = "false";
         }
     });
@@ -578,6 +590,7 @@ function playPauseSetup() {
             e.preventDefault();
             currentFrame = Math.min(currentFrame + 1, totalFrames);
             videoEl.currentTime = currentFrame / fps;
+            originalVideoEl.currentTime = currentFrame / fps;
             return;
         }
 
@@ -585,6 +598,7 @@ function playPauseSetup() {
             e.preventDefault();
             currentFrame = Math.max(currentFrame - 1, 0);
             videoEl.currentTime = currentFrame / fps;
+            originalVideoEl.currentTime = currentFrame / fps;
             return;
         }
     });

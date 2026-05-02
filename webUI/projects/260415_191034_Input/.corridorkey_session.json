@@ -2,12 +2,12 @@
   "version": 1,
   "params": {
     "input_is_linear": true,
-    "despill_strength": "0.1",
-    "auto_despeckle": true,
+    "despill_strength": "0.5",
+    "auto_despeckle": false,
     "despeckle_size": "430",
     "despeckle_dilation": 25,
     "despeckle_blur": 5,
-    "refiner_scale": "2.1",
+    "refiner_scale": "0.9",
     "source_passthrough": true,
     "edge_erode_px": null,
     "edge_blur_px": null

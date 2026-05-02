@@ -117,16 +117,42 @@ function update_exports_list() {
     });
 }
 
-// View modes togglers
-
+// Compare mode toggler
 const previewContainer = document.getElementById("preview");
+let selectedMode = "";
+
+const toggleVideo = (e) => {
+    if (!videoEl) return;
+    const hidden = e.type == "mousedown";
+    videoEl.style.opacity = hidden ? 0 : 1;
+    previewContainer.classList.toggle("cursor-default", hidden);
+};
+
+function update_compare_mode(compareTogglerParent) {
+    selectedMode = compareTogglerParent?.querySelector(".btn-primary-sm")?.textContent || "";
+
+    if (selectedMode == "Hold") {
+        originalVideoEl.classList.remove("opacity-0");
+        previewContainer.classList.add("cursor-pointer");
+
+        previewContainer.addEventListener("mousedown", toggleVideo);
+        previewContainer.addEventListener("mouseup", toggleVideo);
+    } else {
+        originalVideoEl.classList.add("opacity-0");
+        if (videoEl) videoEl.style.opacity = 1;
+        previewContainer.classList.remove("cursor-pointer");
+
+        previewContainer.removeEventListener("mousedown", toggleVideo);
+        previewContainer.removeEventListener("mouseup", toggleVideo);
+    }
+}
+
+// View modes togglers
 const view_types = Array.from(document.querySelectorAll("#views button:not([disabled])")).map((child) => child.textContent);
 
 function update_view() {
     generation_progress?.classList?.add("hidden");
     previewContainer.classList.remove("hidden");
-
-    previewContainer.querySelector("p").classList.add("hidden");
 
     if (exportsList?.children) {
         document.querySelector("#exports-list li.selected")?.classList?.remove("selected");
@@ -141,7 +167,7 @@ function update_view() {
 
     switch (current_view) {
         case "Original":
-            video_viewer(`/media/${PROJECT_NAME}/clips/Input/Source/Input.mp4`);
+            original_video_viewer(`/media/${PROJECT_NAME}/clips/Input/Source/Input.mp4`);
             break;
 
         case "COMP":
@@ -149,7 +175,6 @@ function update_view() {
             break;
 
         case "Alpha":
-            // view_alpha();
             view_frames(true);
             break;
 
@@ -157,10 +182,55 @@ function update_view() {
             view_frames();
             break;
     }
+
+    originalVideoEl?.pause();
+    if (originalVideoEl) originalVideoEl.currentTime = timeStamp;
+    if (videoEl) videoEl.currentTime = timeStamp;
+}
+
+function original_video_viewer(path) {
+    videoEl?.classList?.add("hidden");
+
+    // Seperate Video preview for the original video
+
+    if (!originalVideoEl) {
+        create_video_element(path, true);
+
+        const doSomethingWithTheFrame = (now, metadata) => {
+            if (originalVideoEl) {
+                // console.log(now, metadata);
+                const currentTime = metadata.mediaTime;
+                const progress = (currentTime / videoDuration) * 100;
+                updateFromEvent(undefined, progress, currentTime);
+            }
+
+            // Re-register the callback to be notified about the next frame.
+            originalVideoEl.requestVideoFrameCallback(doSomethingWithTheFrame);
+        };
+
+        originalVideoEl.requestVideoFrameCallback(doSomethingWithTheFrame);
+
+        originalVideoEl.addEventListener("loadedmetadata", () => {
+            if (videoDuration == 0) videoDuration = originalVideoEl.duration;
+            if (totalFrames == 0) totalFrames = Math.round(fps * videoDuration);
+
+            document.getElementById("frames-total").textContent = totalFrames;
+            buildTicks(totalFrames);
+        });
+
+        originalVideoEl.addEventListener("ended", () => {
+            if (!playPauseButton) return;
+            playPauseButton.dataset.playing = "false";
+        });
+    } else {
+        originalVideoEl.classList.remove("opacity-0");
+    }
+
+    if (!fps) count_frames(originalVideoEl);
 }
 
 function video_viewer(path) {
-    imageEl?.classList?.add("hidden");
+    originalVideoEl.classList.toggle("opacity-0", selectedMode === "");
 
     // Video preview
     if (!videoEl) {
@@ -171,21 +241,6 @@ function video_viewer(path) {
     }
 
     if (!fps) count_frames(videoEl);
-}
-
-// This is for the videos that are stored as frame => TODO: just convert to mp4 on server
-function view_alpha() {
-    videoEl?.classList?.add("hidden");
-
-    let frameString = currentFrame.toString().padStart(6, "0"); // format: 000594 with 594 being the frame
-
-    // Frame preview
-    if (!imageEl) {
-        create_image_element(`/media/${PROJECT_NAME}/clips/Input/AlphaHint/frame_${frameString}.png`);
-    } else {
-        imageEl.classList.remove("hidden");
-        imageEl.src = `/media/${PROJECT_NAME}/clips/Input/AlphaHint/frame_${frameString}.png`;
-    }
 }
 
 async function view_frames(isAlpha = false) {
@@ -221,49 +276,17 @@ async function view_frames(isAlpha = false) {
 
 // Helpers
 
-function create_video_element(src) {
-    videoEl = document.createElement("video");
-    videoEl.src = src;
-    videoEl.preload = "metadata";
-    videoEl.controls = false;
-    videoEl.className = "max-h-full max-w-full rounded";
+function create_video_element(src, isOriginal = false) {
+    const newVideo = document.createElement("video");
+    newVideo.src = src;
+    newVideo.preload = "metadata";
+    newVideo.controls = false;
+    newVideo.className = `max-h-full max-w-full rounded ${isOriginal ? "absolute" : "z-10"}`;
 
-    previewContainer.append(videoEl);
+    previewContainer.append(newVideo);
 
-    const doSomethingWithTheFrame = (now, metadata) => {
-        if (videoEl) {
-            // console.log(now, metadata);
-            const currentTime = metadata.mediaTime;
-            const progress = (currentTime / videoDuration) * 100;
-            updateFromEvent(undefined, progress, currentTime);
-        }
-
-        // Re-register the callback to be notified about the next frame.
-        videoEl.requestVideoFrameCallback(doSomethingWithTheFrame);
-    };
-
-    videoEl.requestVideoFrameCallback(doSomethingWithTheFrame);
-
-    videoEl.addEventListener("loadedmetadata", () => {
-        if (videoDuration == 0) videoDuration = videoEl.duration;
-        if (totalFrames == 0) totalFrames = Math.round(fps * videoDuration);
-
-        document.getElementById("frames-total").textContent = totalFrames;
-        buildTicks(totalFrames);
-    });
-
-    videoEl.addEventListener("ended", () => {
-        if (!playPauseButton) return;
-        playPauseButton.dataset.playing = "false";
-    });
-}
-
-function create_image_element(src) {
-    imageEl = document.createElement("img");
-    imageEl.src = src;
-    imageEl.className = "max-h-full max-w-full rounded";
-
-    previewContainer.append(imageEl);
+    if (isOriginal) originalVideoEl = newVideo;
+    else videoEl = newVideo;
 }
 
 const generation_progress = document.getElementById("generate-progress");
@@ -396,7 +419,7 @@ function click_thumbnail(event) {
 
         if (target.textContent.includes(view_type)) {
             current_view = view_type;
-            toggle_group.querySelector(".btn-primary-sm").classList.replace("btn-primary-sm", "btn-secondary-sm");
+            document.querySelector("#views .btn-primary-sm").classList.replace("btn-primary-sm", "btn-secondary-sm");
             view_button.classList.replace("btn-secondary-sm", "btn-primary-sm");
 
             update_view();

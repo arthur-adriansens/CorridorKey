@@ -606,6 +606,18 @@ video {
   z-index: 30;
 }
 
+.z-10 {
+  z-index: 10;
+}
+
+.-z-10 {
+  z-index: -10;
+}
+
+.z-0 {
+  z-index: 0;
+}
+
 .col-span-2 {
   grid-column: span 2 / span 2;
 }
@@ -665,6 +677,10 @@ video {
 
 .hidden {
   display: none;
+}
+
+.\!hidden {
+  display: none !important;
 }
 
 .size-11 {
@@ -763,6 +779,10 @@ video {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.cursor-default {
+  cursor: default;
 }
 
 .select-none {
@@ -1524,6 +1544,10 @@ div:has(>ul#exports-list>li.selected)>div#export-actions {
   background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
 }
 
+.group:hover .group-hover\:flex {
+  display: flex;
+}
+
 .group:hover .group-hover\:w-2 {
   width: 0.5rem;
 }
@@ -1551,6 +1575,10 @@ div:has(>ul#exports-list>li.selected)>div#export-actions {
 
 .peer:checked ~ .peer-checked\:opacity-100 {
   opacity: 1;
+}
+
+.has-\[\.btn-primary-sm\]\:flex:has(.btn-primary-sm) {
+  display: flex;
 }
 
 .has-\[input\:checked\]\:opacity-100:has(input:checked) {
