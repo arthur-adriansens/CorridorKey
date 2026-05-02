@@ -138,7 +138,8 @@ function update_compare_mode(compareTogglerParent) {
         previewContainer.addEventListener("mousedown", toggleVideo);
         previewContainer.addEventListener("mouseup", toggleVideo);
     } else {
-        originalVideoEl.classList.add("opacity-0");
+        console.log(current_view);
+        originalVideoEl.classList.toggle("opacity-0", current_view !== "Original");
         if (videoEl) videoEl.style.opacity = 1;
         previewContainer.classList.remove("cursor-pointer");
 
