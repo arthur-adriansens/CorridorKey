@@ -34,5 +34,5 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Enable OpenEXR support in OpenCV.
 ENV OPENCV_IO_ENABLE_OPENEXR=1
 
-ENTRYPOINT ["/app/.venv/bin/python", "corridorkey_cli.py"]
+ENTRYPOINT ["/app/.venv/bin/python", "unused_root_files/corridorkey_cli.py"]
 CMD ["--action", "list"]

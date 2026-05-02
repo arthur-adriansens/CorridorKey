@@ -598,24 +598,20 @@ video {
   top: 0px;
 }
 
-.z-20 {
-  z-index: 20;
-}
-
-.z-30 {
-  z-index: 30;
+.z-0 {
+  z-index: 0;
 }
 
 .z-10 {
   z-index: 10;
 }
 
-.-z-10 {
-  z-index: -10;
+.z-20 {
+  z-index: 20;
 }
 
-.z-0 {
-  z-index: 0;
+.z-30 {
+  z-index: 30;
 }
 
 .col-span-2 {
@@ -677,10 +673,6 @@ video {
 
 .hidden {
   display: none;
-}
-
-.\!hidden {
-  display: none !important;
 }
 
 .size-11 {
@@ -773,16 +765,16 @@ video {
   cursor: col-resize;
 }
 
+.cursor-default {
+  cursor: default;
+}
+
 .cursor-not-allowed {
   cursor: not-allowed;
 }
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.cursor-default {
-  cursor: default;
 }
 
 .select-none {

@@ -2,7 +2,7 @@
     "inferenceControls": {
         "colorSpace": {
             "label": "Color Space",
-            "description": "DOESNT WORK YET - Defines how CorridorKey interprets the input footage before inference. If the input looks wrong here, all inference outputs will be based on that incorrect interpretation. Changing this after inference does not rewrite existing output files."
+            "description": "DOESN'T WORK YET - Defines how CorridorKey interprets the input footage before inference. If the input looks wrong here, all inference outputs will be based on that incorrect interpretation. Changing this after inference does not rewrite existing output files."
         },
         "despillStrength": {
             "label": "Despill Strength",
@@ -93,6 +93,14 @@
         "processed": {
             "label": "Processed",
             "description": "Shows the final straight-alpha RGBA output intended for production use."
+        },
+        "hold": {
+            "label": "Hold Mode",
+            "description": "Compare with the original version by holding you mouse down on the video."
+        },
+        "AB": {
+            "label": "A/B Mode",
+            "description": "DOESN'T WORK YET - Split the video in half to compare with the original version."
         }
     },
     "preferences": {

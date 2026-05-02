@@ -4,7 +4,7 @@ Thanks for your interest in improving CorridorKey! Whether you're a VFX artist, 
 
 ## Legal Agreement
 
-By contributing to this project, you agree that your contributions will be licensed under the project's **[CorridorKey Licence](LICENSE)**.
+By contributing to this project, you agree that your contributions will be licensed under the project's **[CorridorKey Licence](../LICENSE)**.
 
 By submitting a Pull Request, you specifically acknowledge and agree to the terms set forth in **Section 6 (CONTRIBUTIONS)** of the license. This ensures that Corridor Digital maintains the full right to use, distribute, and sublicense this codebase, including PR contributions. This is a project for the community, and will always remain freely available here.
 
@@ -96,7 +96,7 @@ In your PR description, focus on **why** you made the change, not just what chan
 
 ### Model Weights
 
-The model checkpoint (`CorridorKey_v1.0.pth`) and optional GVM/VideoMaMa weights are **not** in the git repo. Most tests don't need them. If you're working on inference code and need the weights, follow the download instructions in the [README](README.md).
+The model checkpoint (`CorridorKey_v1.0.pth`) and optional GVM/VideoMaMa weights are **not** in the git repo. Most tests don't need them. If you're working on inference code and need the weights, follow the download instructions in the [README](../README.md).
 
 ## Questions?
 

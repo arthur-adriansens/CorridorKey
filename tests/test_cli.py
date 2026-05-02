@@ -8,7 +8,7 @@ from unittest.mock import patch
 from typer.testing import CliRunner
 
 from clip_manager import InferenceSettings
-from corridorkey_cli import app
+from unused_root_files.corridorkey_cli import app
 
 runner = CliRunner()
 
@@ -96,9 +96,9 @@ class TestInferenceSettings:
 
 
 class TestCallbackProtocol:
-    @patch("corridorkey_cli.scan_clips")
-    @patch("corridorkey_cli.run_inference")
-    @patch("corridorkey_cli._prompt_inference_settings")
+    @patch("unused_root_files.corridorkey_cli.scan_clips")
+    @patch("unused_root_files.corridorkey_cli.run_inference")
+    @patch("unused_root_files.corridorkey_cli._prompt_inference_settings")
     def test_run_inference_passes_callbacks(self, mock_prompt, mock_run, mock_scan):
         """run-inference subcommand passes on_clip_start and on_frame_complete."""
         mock_scan.return_value = []
@@ -116,7 +116,7 @@ class TestCallbackProtocol:
 
     def test_callback_signatures(self):
         """Callbacks accept the documented (name, count) / (idx, total) args."""
-        from corridorkey_cli import ProgressContext
+        from unused_root_files.corridorkey_cli import ProgressContext
 
         ctx = ProgressContext()
         ctx.__enter__()
@@ -135,7 +135,7 @@ class TestCallbackProtocol:
 
 
 class TestListClips:
-    @patch("corridorkey_cli.scan_clips")
+    @patch("unused_root_files.corridorkey_cli.scan_clips")
     def test_list_clips_calls_scan(self, mock_scan):
         mock_scan.return_value = []
         result = runner.invoke(app, ["list-clips"])
@@ -149,8 +149,8 @@ class TestListClips:
 
 
 class TestNonInteractiveFlags:
-    @patch("corridorkey_cli.scan_clips")
-    @patch("corridorkey_cli.run_inference")
+    @patch("unused_root_files.corridorkey_cli.scan_clips")
+    @patch("unused_root_files.corridorkey_cli.run_inference")
     def test_all_flags_skips_prompts(self, mock_run, mock_scan):
         """When all settings flags are provided, no interactive prompts fire."""
         mock_scan.return_value = []
@@ -180,8 +180,8 @@ class TestNonInteractiveFlags:
         assert settings.despeckle_size == 200
         assert settings.refiner_scale == 1.5
 
-    @patch("corridorkey_cli.scan_clips")
-    @patch("corridorkey_cli.run_inference")
+    @patch("unused_root_files.corridorkey_cli.scan_clips")
+    @patch("unused_root_files.corridorkey_cli.run_inference")
     def test_srgb_flag(self, mock_run, mock_scan):
         """--srgb sets input_is_linear=False."""
         mock_scan.return_value = []
@@ -206,8 +206,8 @@ class TestNonInteractiveFlags:
         assert settings.input_is_linear is False
         assert settings.auto_despeckle is False
 
-    @patch("corridorkey_cli.scan_clips")
-    @patch("corridorkey_cli.run_inference")
+    @patch("unused_root_files.corridorkey_cli.scan_clips")
+    @patch("unused_root_files.corridorkey_cli.run_inference")
     def test_despill_clamped_to_range(self, mock_run, mock_scan):
         """Despill values outside 0-10 are clamped."""
         mock_scan.return_value = []
@@ -242,8 +242,8 @@ class TestNonInteractiveFlags:
         assert "--despeckle-size" in plain
         assert "--skip-existing" in plain
 
-    @patch("corridorkey_cli.scan_clips")
-    @patch("corridorkey_cli.run_inference")
+    @patch("unused_root_files.corridorkey_cli.scan_clips")
+    @patch("unused_root_files.corridorkey_cli.run_inference")
     def test_skip_existing_passed_through(self, mock_run, mock_scan):
         """--skip-existing is forwarded to run_inference as skip_existing kwarg."""
         mock_scan.return_value = []

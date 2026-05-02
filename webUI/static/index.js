@@ -17,9 +17,7 @@ let current_view = document.querySelector("#views > .btn-primary-sm")?.textConte
 // Get project name from url
 const url_string = new URL(window.location.href);
 const PROJECT_NAME = url_string.searchParams.get("name");
-console.log(PROJECT_NAME);
-// const PROJECT_NAME = "testing";
-// const PROJECT_NAME = "260415_191034_Input";
+console.log("Project name:", PROJECT_NAME);
 
 const queue = {};
 

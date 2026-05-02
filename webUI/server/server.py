@@ -6,28 +6,20 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from dataclasses import asdict
 from threading import Thread, Lock
-import subprocess
-import platform
-import json
-import sys
-import os
-import re
+import re, json
+import sys, os, platform, subprocess, logging
 
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../..")))
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" # enable exr support by cv2
+logging.getLogger("asyncio").setLevel(logging.ERROR)
 
 import numpy as np
 import cv2
 
-
 # Import corridorKey logic
 from backend.ffmpeg_tools import find_ffmpeg, stitch_video
-import device_utils
-import clip_manager
-
-# Add these imports for inference
-from clip_manager import ClipAsset, ClipEntry, InferenceSettings, run_inference
-from device_utils import resolve_device
+from device_utils import resolve_device, enumerate_gpus
+from clip_manager import ClipAsset, ClipEntry, InferenceSettings, run_inference, get_birefnet_usage_options
 
 # Project root
 ROOT = Path(__file__).resolve().parent.parent 
@@ -68,7 +60,7 @@ def health():
 
 @app.get("/api/GPUs")
 def gpus():
-    gpus = device_utils.enumerate_gpus()
+    gpus = enumerate_gpus()
     return [asdict(gpu) for gpu in gpus]
 
 @app.get("/api/projects")
@@ -96,7 +88,7 @@ def project_info(project: str):
         raise HTTPException(status_code=404, detail="Project not found.")
 
     # get BiRefNet availble options
-    birefnet_options = clip_manager.get_birefnet_usage_options()
+    birefnet_options = get_birefnet_usage_options()
 
     # get exports
     exports_path = (PROJECT_ROOT / project / "clips/Input/_EXPORTS")
@@ -228,7 +220,7 @@ def update_json(payload: dict):
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Failed to save options: {exc}")
 
-    print(f"Updated project {project}.")
+    # print(f"Updated parameters for '{project}'.")
 
     return {"status": f"Options saved for project {project}"}
 

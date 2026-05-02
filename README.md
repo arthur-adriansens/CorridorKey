@@ -20,10 +20,12 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
         ```py
         run_inference([clip], device=device, backend="auto" # here, ...)
         ```
-- [ ] Move original clip in UI to a underlying layer to implement "hold" compare mode
-- [ ] A/B compare mode?
+- [ x ] Move original clip in UI to a underlying layer to implement "hold" compare mode
+- [ ] A/B compare mode
 - [ x ] Add a working queue with progress bar as background
-- [ ] Add explenation to views
+- [ x ] Add explenation to views and compare modes
+- [ ] Clean the 2 README's up.
+- [ ] "Starting server" and "Project not found" page
 
 ## Developer notes
 
@@ -196,8 +198,8 @@ Auto mode prefers MLX on Apple Silicon when available.
 **Override via CLI flag (corridorkey_cli.py):**
 
 ```bash
-uv run python corridorkey_cli.py wizard --win_path "/path/to/clips" --backend mlx
-uv run python corridorkey_cli.py run_inference --backend torch
+uv run python unused_root_files/corridorkey_cli.py wizard --win_path "/path/to/clips" --backend mlx
+uv run python unused_root_files/corridorkey_cli.py run_inference --backend torch
 ```
 
 ## Troubleshooting
