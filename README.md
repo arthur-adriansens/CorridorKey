@@ -22,6 +22,7 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
 - [ ] Clean the 2 README's up.
 - [ ] "Starting server" and "Project not found" page
 - [x] Load queue when reloading UI page
+- [] Display average frames per second processing speed and time estimate for inference
 
 ## Developer notes
 

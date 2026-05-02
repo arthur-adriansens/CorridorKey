@@ -508,14 +508,14 @@ function count_frames(video) {
 async function check_queue() {
     const inference = await fetch("/api/inferenceProgress");
     const inference_data = await inference.json();
-    if (inference_data?.stage !== "idle") {
+    if (inference_data?.stage !== "idle" && inference_data?.stage !== "done") {
         current_view = "queue";
         run_interference(true);
     }
 
     const exporting = await fetch("/api/exportProgress");
     const exporting_data = await exporting.json();
-    if (exporting_data?.stage !== "idle") {
+    if (exporting_data?.stage !== "idle" && exporting_data?.stage !== "done") {
         current_view = "queue";
         generate_export(undefined, true);
     }
