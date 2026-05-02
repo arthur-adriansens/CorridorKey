@@ -10,14 +10,7 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
     - [x] Connect progress and queue to UI
     - [x] Bug where no clips are found (fixed with auto frame pattern detection)
     - [ ] Color space (sRGB / linear)
-    - [ ] Add cuda check:
-        ```py
-        import torch
-        print(torch.__version__)
-        print("available:", torch.cuda.is_available()) #true?
-        print("cuda devices:", torch.cuda.device_count()) #>= 1?
-        print("cuda version:", torch.version.cuda)
-        ```
+    - [x] ~~Add cuda check~~
     - [ ] Implement custom backend:
         ```py
         run_inference([clip], device=device, backend="auto" # here, ...)
@@ -28,7 +21,7 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
 - [x] Add explenation to views and compare modes
 - [ ] Clean the 2 README's up.
 - [ ] "Starting server" and "Project not found" page
-- [ ] Load queue when reloading UI page
+- [x] Load queue when reloading UI page
 
 ## Developer notes
 

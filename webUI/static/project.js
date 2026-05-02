@@ -95,6 +95,10 @@ async function load_project() {
     }
 
     update_view();
+
+    if (!originalVideoEl) {
+        original_video_viewer();
+    }
 }
 
 const exportsList = document.getElementById("exports-list");
@@ -138,7 +142,6 @@ function update_compare_mode(compareTogglerParent) {
         previewContainer.addEventListener("mousedown", toggleVideo);
         previewContainer.addEventListener("mouseup", toggleVideo);
     } else {
-        console.log(current_view);
         originalVideoEl.classList.toggle("opacity-0", current_view !== "Original");
         if (videoEl) videoEl.style.opacity = 1;
         previewContainer.classList.remove("cursor-pointer");
@@ -168,7 +171,7 @@ function update_view() {
 
     switch (current_view) {
         case "Original":
-            original_video_viewer(`/media/${PROJECT_NAME}/clips/Input/Source/Input.mp4`);
+            original_video_viewer();
             break;
 
         case "COMP":
@@ -177,6 +180,10 @@ function update_view() {
 
         case "Alpha":
             view_frames(true);
+            break;
+
+        case "queue":
+            previewContainer.classList.add("hidden");
             break;
 
         default:
@@ -189,7 +196,7 @@ function update_view() {
     if (videoEl) videoEl.currentTime = timeStamp;
 }
 
-function original_video_viewer(path) {
+function original_video_viewer(path = `/media/${PROJECT_NAME}/clips/Input/Source/Input.mp4`) {
     videoEl?.classList?.add("hidden");
 
     // Seperate Video preview for the original video
@@ -309,6 +316,11 @@ const update_queue_ui = (queueID) => {
         list_item = document.createElement("li");
         list_item.textContent = queue[queueID].name;
         list_item.dataset.id = queueID;
+        list_item.onclick = () => {
+            current_view = "queue";
+            update_view();
+        };
+
         queue_ul.append(list_item);
         empty_queue.style.display = "none";
     }
@@ -321,7 +333,7 @@ const update_queue_ui = (queueID) => {
 
 const generation_progress = document.getElementById("generate-progress");
 
-async function generate_export(custom_view) {
+async function generate_export(custom_view, already_running = false) {
     generation_progress.classList.remove("hidden");
     previewContainer.classList.add("hidden");
 
@@ -333,7 +345,9 @@ async function generate_export(custom_view) {
     id = Object.keys(queue).length + 1;
     queue[id] = { name: "Exporting", percent: 0 };
 
-    await fetch(`/api/generateExport?project=${PROJECT_NAME}&export_type=${custom_view || current_view}&fps=${fps || 30}`, { method: "POST" });
+    if (!already_running) {
+        await fetch(`/api/generateExport?project=${PROJECT_NAME}&export_type=${custom_view || current_view}&fps=${fps || 30}`, { method: "POST" });
+    }
 
     async function poll() {
         const res = await fetch("/api/exportProgress");
@@ -390,7 +404,7 @@ async function generate_export(custom_view) {
 
 const inference_progress = document.getElementById("inference-progress");
 
-async function run_interference(custom_view) {
+async function run_interference(already_running = false) {
     inference_progress.classList.remove("hidden");
     previewContainer.classList.add("hidden");
 
@@ -402,18 +416,19 @@ async function run_interference(custom_view) {
     id = Object.keys(queue).length + 1;
     queue[id] = { name: "Setting Up", percent: 0 };
 
-    await fetch("/api/runInterference", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            project: PROJECT_NAME,
-        }),
-    });
+    if (!already_running) {
+        await fetch("/api/runInterference", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                project: PROJECT_NAME,
+            }),
+        });
+    }
 
     async function poll() {
         const res = await fetch("/api/inferenceProgress");
         const data = await res.json();
-        console.log(data);
 
         // Update text in preview window
         if (data.stage === "setup") {
@@ -488,6 +503,25 @@ function count_frames(video) {
         buildTicks(totalFrames);
     });
 }
+
+// Check if something is already in queue
+async function check_queue() {
+    const inference = await fetch("/api/inferenceProgress");
+    const inference_data = await inference.json();
+    if (inference_data?.stage !== "idle") {
+        current_view = "queue";
+        run_interference(true);
+    }
+
+    const exporting = await fetch("/api/exportProgress");
+    const exporting_data = await exporting.json();
+    if (exporting_data?.stage !== "idle") {
+        current_view = "queue";
+        generate_export(undefined, true);
+    }
+}
+
+check_queue(); // Once, on page load
 
 function get_thumbnail(videoFileName) {
     const thumbnailEl = document.createElement("img");
