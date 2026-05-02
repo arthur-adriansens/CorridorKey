@@ -6,9 +6,9 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
 ## Todo's
 
 - [ ] Make interference work.
-    - [ x ] Make it work (lol).
-    - [ x ] Connect progress and queue to UI
-    - [ x ] Bug where no clips are found (fixed with auto frame pattern detection)
+    - [x] Make it work (lol).
+    - [x] Connect progress and queue to UI
+    - [x] Bug where no clips are found (fixed with auto frame pattern detection)
     - [ ] Color space (sRGB / linear)
     - [ ] Add cuda check:
         ```py
@@ -22,10 +22,10 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
         ```py
         run_inference([clip], device=device, backend="auto" # here, ...)
         ```
-- [ x ] Move original clip in UI to a underlying layer to implement "hold" compare mode
+- [x] Move original clip in UI to a underlying layer to implement "hold" compare mode
 - [ ] A/B compare mode
-- [ x ] Add a working queue with progress bar as background
-- [ x ] Add explenation to views and compare modes
+- [x] Add a working queue with progress bar as background
+- [x] Add explenation to views and compare modes
 - [ ] Clean the 2 README's up.
 - [ ] "Starting server" and "Project not found" page
 - [ ] Load queue when reloading UI page
