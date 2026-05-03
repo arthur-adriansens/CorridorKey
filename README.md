@@ -1,20 +1,20 @@
 # CorridorKey (webUI fork)
 
-Hi! This web UI was made by Arthur Adriansens. I stepped out of my comfort zone (JavaScripe, Node.js and Astro) to use Python. This UI version doens't use any pip python libraries, only native.
-I wanted to avoid adding any packages to this awesome project, so I only used devDependencies, because I want to use Tailwind CSS for faster development and maintainability.
+Hi! This web UI was made by Arthur Adriansens. I stepped out of my comfort zone (JavaScript, Node.js and Astro) to use Python. The backend uses standard library, together with the already installed packages from CorridorKey, plus fastapi.
+
+I wanted to avoid adding any JavaScript packages to this project, so I only used devDependencies (no package.json needed), because I want to use Tailwind CSS for faster development and maintainability.
+
+Special thanks to EZ-CorridorKey for inspiring this project. A big part of the UI explenations are from EZ-CorridorKey.
 
 ## Todo's
 
-- [ ] Make interference work.
+- [x] Make inference work.
     - [x] Make it work (lol).
     - [x] Connect progress and queue to UI
     - [x] Bug where no clips are found (fixed with auto frame pattern detection)
-    - [ ] Color space (sRGB / linear)
+    - [x] Color space (sRGB / linear)
     - [x] ~~Add cuda check~~
-    - [ ] Implement custom backend:
-        ```py
-        run_inference([clip], device=device, backend="auto" # here, ...)
-        ```
+    - [x] Implement custom backend
 - [x] Move original clip in UI to a underlying layer to implement "hold" compare mode
 - [ ] A/B compare mode
 - [x] Add a working queue with progress bar as background
@@ -22,7 +22,8 @@ I wanted to avoid adding any packages to this awesome project, so I only used de
 - [ ] Clean the 2 README's up.
 - [ ] "Starting server" and "Project not found" page
 - [x] Load queue when reloading UI page
-- [] Display average frames per second processing speed and time estimate for inference
+- [ ] Display average frames per second processing speed and time estimate for inference
+- [ ] Add Linear <-> sRGB converter (see color_utils.linear_to_srgb and srgb_to_linear functions)
 
 ## Developer notes
 

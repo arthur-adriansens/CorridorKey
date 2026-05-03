@@ -2,7 +2,9 @@
 
 Hi! This web UI was made by Arthur Adriansens. I stepped out of my comfort zone (JavaScript, Node.js and Astro) to use Python. The backend uses standard library, together with the already installed packages from CorridorKey, plus fastapi.
 
-I wanted to avoid adding any JavaScript packages to this awesome project, so I only used devDependencies (no package.json needed), because I want to use Tailwind CSS for faster development and maintainability.
+I wanted to avoid adding any JavaScript packages to this project, so I only used devDependencies (no package.json needed), because I want to use Tailwind CSS for faster development and maintainability.
+
+Special thanks to EZ-CorridorKey for inspiring this project. A big part of the UI explenations are from EZ-CorridorKey.
 
 ![UI screenshot](./static/images/screenshot.png "UI screenshot")
 

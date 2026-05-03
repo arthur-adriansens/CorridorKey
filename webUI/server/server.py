@@ -229,17 +229,12 @@ def update_json(payload: dict):
 
     return {"status": f"Options saved for project {project}"}
 
-# import torch
-# print(torch.__version__)
-# print("cuda available:", torch.cuda.is_available())
-# print("cuda devices:", torch.cuda.device_count())
-# print("cuda version:", torch.version.cuda)
-
 @app.post("/api/runInterference")
 def run_interference(payload: dict):
     _set_inference("setup", "Running inference checks", 0, 100)
 
     project = payload.get("project")
+    custom_backend = payload.get("backend")
 
     if not project:
         _set_inference("error", "Project required", 0, 0)
@@ -312,7 +307,7 @@ def run_interference(payload: dict):
     # Run inference in background thread
     thread = Thread(
         target=_run_inference_worker,
-        args=(clip, settings),
+        args=(clip, settings, custom_backend),
         daemon=True,
     )
     thread.start()
@@ -327,13 +322,13 @@ def on_clip_start(clip_name: str, total_frames: int):
 def on_frame_complete(current: int, total: int):
     _set_inference("inference", "Rendering frames", current+1, total)
 
-def _run_inference_worker(clip, settings):
+def _run_inference_worker(clip, settings, custom_backend="auto"):
     try:
         device = resolve_device("auto")
         run_inference(
             [clip],
             device=device,
-            backend="auto",
+            backend=(custom_backend or "auto"),
             settings=settings,
             on_clip_start=on_clip_start,
             on_frame_complete=on_frame_complete,

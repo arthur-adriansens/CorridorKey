@@ -83,6 +83,7 @@ async function load_project() {
             if (input_type == "checkbox") input.checked = parameters[option];
 
             input.value = parameters[option];
+            if (option == "input_is_linear") input.value = parameters[option] ? "Linear" : "sRGB";
             updateDynamicLabel(input);
         }
 
@@ -422,6 +423,7 @@ async function run_interference(already_running = false) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 project: PROJECT_NAME,
+                backend: document.getElementById("backend").value || "auto",
             }),
         });
     }
@@ -564,11 +566,12 @@ async function updateParameter(event) {
     const input = event.target;
     if (projectData?.options?.version === undefined) return;
 
-    const old_value = findKey(projectData.options, input.id);
+    let old_value = findKey(projectData.options, input.id);
     if (old_value === undefined) return;
 
     let new_value = input.type == "checkbox" ? input.checked : input.value;
-    if ((!typeof new_value) in ["boolean", "options"] && +new_value !== NaN) new_value = +new_value;
+    if (!((typeof new_value) in ["boolean", "options"]) && +new_value !== NaN) new_value = +new_value;
+    if (input.id == "input_is_linear") new_value = input.value == "Linear";
 
     setKey(projectData.options, input.id, new_value);
 

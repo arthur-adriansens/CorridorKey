@@ -1,8 +1,12 @@
 {
     "inferenceControls": {
+        "backend": {
+            "label": "Engine Backend",
+            "description": "Auto is recommended: inference will select the fastest available backend (MLX: 1.5-2x faster) when corridorkey-mlx and a .safetensors checkpoint are present, otherwise PyTorch MPS."
+        },
         "colorSpace": {
             "label": "Color Space",
-            "description": "DOESN'T WORK YET - Defines how CorridorKey interprets the input footage before inference. If the input looks wrong here, all inference outputs will be based on that incorrect interpretation. Changing this after inference does not rewrite existing output files."
+            "description": "Defines how CorridorKey interprets the input footage before inference. If the input looks wrong here, all inference outputs will be based on that incorrect interpretation. Changing this after inference does not rewrite existing output files."
         },
         "despillStrength": {
             "label": "Despill Strength",

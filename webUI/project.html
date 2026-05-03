@@ -234,6 +234,7 @@
                             <label class="text-zinc-400 text-sm" for="backend">Backend</label>
                             <select id="backend" class="mt-1 w-full bg-zinc-800 border rounded outline-none px-2 py-2">
                                 <option>CorridorKey</option>
+
                                 <option>CorridorKey Lite</option>
                                 <option>MLX</option>
                             </select>
@@ -248,8 +249,8 @@
                         </legend>
 
                         <div class="space-y-2" data-explain="inferenceControls.colorSpace">
-                            <label class="text-zinc-400 text-sm cursor-pointer" for="colors">Color Space</label>
-                            <select id="colors" class="mt-1 w-full bg-zinc-800 border rounded px-2 py-2">
+                            <label class="text-zinc-400 text-sm cursor-pointer" for="input_is_linear">Color Space</label>
+                            <select id="input_is_linear" class="mt-1 w-full bg-zinc-800 border rounded px-2 py-2">
                                 <option>sRGB</option>
                                 <option>Linear</option>
                             </select>
@@ -290,6 +291,15 @@
                         <div class="flex gap-2" data-explain="inferenceControls.livePreview">
                             <input type="checkbox" class="z-20 cursor-pointer" id="live_preview" checked />
                             <label class="text-zinc-400 text-sm cursor-pointer" for="live_preview">Live Preview </label>
+                        </div>
+
+                        <div class="space-y-2" data-explain="inferenceControls.backend">
+                            <label class="text-zinc-400 text-sm" for="backend">Backend</label>
+                            <select id="backend" class="mt-1 w-full bg-zinc-800 border rounded outline-none px-2 py-2">
+                                <option>auto</option>
+                                <option>mlx</option>
+                                <option>torch</option>
+                            </select>
                         </div>
                     </fieldset>
 
