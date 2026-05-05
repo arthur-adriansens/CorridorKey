@@ -1,1 +1,78 @@
-starting server... // TODO mooi maken :)
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Starting CorridorKey web UI</title>
+        <link rel="stylesheet" href="./static/styles.css" />
+    </head>
+
+    <body class="bg-corridor-bg text-zinc-200 h-screen overflow-hidden">
+        <!-- TOP BAR -->
+        <header class="h-12 flex items-center justify-between px-3 bg-corridor-dark border-b">
+            <p class="font-semibold text-sm text-corridor-yellow">CorridorKey web UI</p>
+
+            <div class="flex items-center gap-2">
+                <div class="w-20 h-6 bg-zinc-700 rounded animate-pulse"></div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex items-center h-[calc(100vh-48px-32px)] justify-center">
+            <div class="text-center">
+                <h1 class="text-3xl font-semibold text-corridor-yellow mb-6" id="status">Starting Server</h1>
+                <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-corridor-yellow mx-auto mb-4" id="spinner"></div>
+                <p class="text-zinc-400 text-lg" id="extraStatus">Initializing CorridorKey server...</p>
+                <p class="text-zinc-500 text-sm mt-2" id="waitText">This may take a few moments</p>
+            </div>
+        </main>
+
+        <!-- STATUS BAR -->
+        <footer class="h-8 flex items-center justify-between px-3 bg-corridor-dark border-t text-xs text-zinc-400">
+            <p>Local server: <span class="text-warning">Starting...</span></p>
+
+            <div class="flex gap-3 items-center group">
+                <p class="text-nowrap relative">
+                    <span class="opacity-100 group-hover:opacity-0">GPU: Initializing...</span>
+                    <span class="opacity-0 group-hover:opacity-100 absolute right-0">VRAM: Loading...</span>
+                </p>
+
+                <div class="w-20 h-3 rounded border overflow-hidden bg-zinc-700">
+                    <div class="h-full w-full bg-corridor-yellow animate-pulse"></div>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            const PORT = "8000";
+            const statusText = document.getElementById("status");
+            const extraStatusText = document.getElementById("extraStatus");
+            const waitText = document.getElementById("waitText");
+            const spinner = document.getElementById("spinner");
+
+            async function ping_server() {
+                try {
+                    const response = await fetch(`http://localhost:${PORT}/api/health`, { mode: "cors" });
+                    if (response.ok) {
+                        const data = await response.json();
+
+                        if (data.status == "Online") {
+                            statusText.classList.add("text-green-400");
+                            statusText.textContent = "Server Online!";
+                            extraStatusText.textContent = "Redirecting...";
+                            spinner.style.display = "none";
+                            waitText.style.display = "none";
+
+                            window.location.href = `http://localhost:${PORT}`;
+                        }
+                    }
+                } catch (error) {
+                    console.log("Server not ready yet:", error.message);
+                    setTimeout(ping_server, 2000); // Retry after 2 seconds
+                }
+            }
+
+            // Start pinging
+            ping_server();
+        </script>
+    </body>
+</html>

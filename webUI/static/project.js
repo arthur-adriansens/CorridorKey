@@ -23,6 +23,11 @@ async function load_project() {
         return;
     }
 
+    if (response.redirected) {
+        window.location.href = response.url;
+        return;
+    }
+
     projectData = await response.json();
     console.log(projectData);
 

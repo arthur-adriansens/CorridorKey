@@ -1,7 +1,8 @@
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, Response, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 from pathlib import Path
 from dataclasses import asdict
@@ -49,6 +50,16 @@ INFERENCE_PROGRESS = {
 INFERENCE_LOCK = Lock()
 
 app = FastAPI() 
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 print("\nServer started! Only (critical) errors and warnings will show up here.")
 
 # -------------------
@@ -86,7 +97,7 @@ def project_info(project: str):
             frames = data.get("frame_count")
             duration = data.get("duration") or (frames / fps)
     else:
-        raise HTTPException(status_code=404, detail="Project not found.")
+        return RedirectResponse(url=f"/projectNotFound?name={project}")
 
     # get BiRefNet availble options
     birefnet_options = get_birefnet_usage_options()
@@ -390,6 +401,10 @@ def index_page():
 @app.get("/project")
 def project_page():
     return FileResponse(ROOT / "project.html")
+
+@app.get("/projectNotFound")
+def project_not_found_page():
+    return FileResponse(ROOT / "projectNotFound.html")
 
 
 app.mount("/", StaticFiles(directory=ROOT, html=True), name="static")

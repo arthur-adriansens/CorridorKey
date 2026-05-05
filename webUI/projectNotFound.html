@@ -1,1 +1,62 @@
-project <NAAM> not found... // TODO mooi maken :) </NAAM>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>CorridorKey web UI Project Not Found</title>
+        <link rel="stylesheet" href="./static/styles.css" />
+    </head>
+
+    <body class="bg-corridor-bg text-zinc-200 h-screen overflow-hidden">
+        <!-- TOP BAR -->
+        <header class="h-12 flex items-center justify-between px-3 bg-corridor-dark border-b">
+            <p class="font-semibold text-sm text-corridor-yellow">CorridorKey web UI</p>
+
+            <div class="flex items-center gap-2">
+                <div class="w-20 h-6 bg-zinc-700 rounded animate-pulse"></div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex flex-col items-center gap-5 text-center h-[calc(100vh-48px-32px)] justify-center">
+            <h1 class="text-3xl font-semibold text-corridor-yellow" id="status">Project Not Found</h1>
+            <p class="text-zinc-400 text-base" id="extraStatus">Project <span id="project-name"></span> doesn't excist.</p>
+            <a href="/" class="btn-secondary-sm !py-2 cursor-pointer flex items-center gap-2 !text-base">
+                Projects
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="fill-none stroke-[#e4e4e7] stroke-[1.5] size-5"
+                >
+                    <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+                    <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                </svg>
+            </a>
+        </main>
+
+        <!-- STATUS BAR -->
+        <footer class="h-8 flex items-center justify-between px-3 bg-corridor-dark border-t text-xs text-zinc-400">
+            <p>Local server: <span class="text-warning">Starting...</span></p>
+
+            <div class="flex gap-3 items-center group">
+                <p class="text-nowrap relative">
+                    <span class="opacity-100 group-hover:opacity-0">GPU: Initializing...</span>
+                    <span class="opacity-0 group-hover:opacity-100 absolute right-0">VRAM: Loading...</span>
+                </p>
+
+                <div class="w-20 h-3 rounded border overflow-hidden bg-zinc-700">
+                    <div class="h-full w-full bg-corridor-yellow animate-pulse"></div>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // Get project name from url
+            const url_string = new URL(window.location.href);
+            const PROJECT_NAME = url_string.searchParams.get("name");
+
+            document.getElementById("project-name").textContent = PROJECT_NAME;
+        </script>
+    </body>
+</html>
