@@ -24,6 +24,7 @@ Special thanks to EZ-CorridorKey for inspiring this project. A big part of the U
 - [x] Load queue when reloading UI page
 - [ ] Display average frames per second processing speed and time estimate for inference
 - [ ] Add Linear <-> sRGB converter (see color_utils.linear_to_srgb and srgb_to_linear functions)
+- [ ] Add an installer page with secondary server which does not need any installation.
 
 ## Developer notes
 
