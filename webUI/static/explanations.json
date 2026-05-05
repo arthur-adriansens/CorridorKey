@@ -154,5 +154,11 @@
             "label": "Error",
             "description": "Processing failed. The operation can be retried."
         }
+    },
+    "errors": {
+        "GPU not available - Switched to CPU-only Pytorch": [
+            "No valid GPU was found, so CUDA support isn't available and GPU-accelerated pipelines (GVM, VideoMaMa) connot run. This can be caused by your settings (like your laptop's energy saver) or other issues. <br /><br /> Now using the much slower and feature-limited CPU-only PyTorch version of CorridorKey.",
+            "1. Open a terminal in the EZ-CorridorKey folder. <br/> 2. Activate the virtual environment: <br/> .venv/Scripts/activate <br/> 3. Reinstall PyTorch with CUDA: <br/> pip install torch torchvision -- index-url https://download.pytorch.org/whl/cu128 <br/> 4. Restart EZ-CorridorKey. <br/> 5. If you don't have an NVIDIA GPU, GVM and VideoMaMa are not supported - use manual alpha hints instead."
+        ]
     }
 }

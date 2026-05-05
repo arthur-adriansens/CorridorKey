@@ -61,7 +61,7 @@ Run the install scripts:
     - [x] ~~Add cuda check~~
     - [x] Implement custom backend
 - [x] Move original clip in UI to a underlying layer to implement "hold" compare mode
-- [ ] A/B compare mode
+- [ ] A/B compare mode""
 - [x] Add a working queue with progress bar as background
 - [x] Add explenation to views and compare modes
 - [x] Clean the 2 README's up.
@@ -70,7 +70,8 @@ Run the install scripts:
 - [ ] Display average frames per second processing speed and time estimate for inference
 - [ ] Add Linear <-> sRGB converter (see color_utils.linear_to_srgb and srgb_to_linear functions)
 - [x] Add an installer page ~~with secondary server~~ which does not need any installation.
-- [] ffmpeg_check en gpu_check popups
+- [x] gpu_check popups
+- [] ffmpeg_check
 - [] webUI update (available) button (git fetch)
 
 ## Developer notes

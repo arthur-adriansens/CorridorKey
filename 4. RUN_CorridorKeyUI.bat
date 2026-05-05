@@ -3,7 +3,7 @@
 
 REM Start Uvicorn server in background (minimized)
 start "Uvicorn" /min cmd /k ^
-  "echo Starting server... && cd /d %~dp0 && uv run --extra cuda uvicorn webUI.server.server:app --log-level warning"
+  "echo Starting server... && cd /d %~dp0 && uv run --extra cuda uvicorn webUI.server.server:app --log-level error"
 
 REM Open browser to the web UI
 start ./webUI/starting.html

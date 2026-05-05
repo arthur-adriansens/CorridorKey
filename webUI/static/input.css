@@ -167,3 +167,18 @@ div#export-actions {
 div:has(>ul#exports-list>li.selected)>div#export-actions {
     @apply opacity-100 pointer-events-auto;
 }
+
+/* Modal popup */
+
+#modal-backdrop {
+    @apply transition-opacity;
+}
+
+#modal-backdrop:not(.hidden),
+#modal:not(.hidden) {
+    @apply opacity-100;
+}
+
+#modal {
+    @apply transition-all shadow-2xl;
+}

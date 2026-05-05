@@ -63,6 +63,7 @@ async function update_gpu_status() {
 
         if (gpus.length === 0) {
             gpu_info.textContent = "No active GPU found";
+            showPopup("GPU not available - Switched to CPU-only Pytorch");
             return;
         }
 
@@ -90,11 +91,6 @@ function updateVRAMBar(gpuInfo) {
 
 update_gpu_status();
 const intervalID2 = setInterval(update_gpu_status, 3 * 1000);
-
-// Server task displayer
-
-// Todo: naast status: "- Uploading... <loading bar>" als iets aan het fetchen
-// custom fetch misschien?
 
 // Get list of projects
 if (!window.location.href.includes("/project")) list_projects();
@@ -312,16 +308,18 @@ function select_export(target) {
 
 const dialog = document.getElementById("explain-dialog");
 const GAP = 8;
-
 let explanations;
-(async () => {
+
+async function get_explenations(params) {
     const response = await fetch("/static/explanations.json");
 
     if (!response.ok) return;
 
     const data = await response.json();
     explanations = data;
-})();
+}
+
+if (window.location.pathname == "/") get_explenations();
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -528,7 +526,12 @@ function updateFromEvent(e, progressFromVideo, currentTimeFromVideo) {
 function updateUI(percentage, currentTime) {
     frameLabel.textContent = currentFrame;
     playhead.style.left = percentage;
-    timecode.textContent = new Date(currentTime * 1000).toISOString().substr(11, 12);
+
+    if (typeof currentTime === "number" && Number.isFinite(currentTime)) {
+        timecode.textContent = new Date(currentTime * 1000).toISOString().substr(11, 12);
+    } else {
+        timecode.textContent = "--:--:--";
+    }
 }
 
 function buildTicks(count) {
@@ -603,3 +606,28 @@ function playPauseSetup() {
 }
 
 playPauseSetup();
+
+/* POPUP MODAL */
+const modal = document.getElementById("modal");
+const modalBackdrop = document.getElementById("modal-backdrop");
+const modalTitle = document.getElementById("model-title");
+const modalText = document.getElementById("model-text");
+const modalExtraText = document.getElementById("model-extra");
+
+async function showPopup(errorKey) {
+    if (!explanations) {
+        await get_explenations();
+    }
+
+    modalTitle.innerHTML = errorKey;
+    modalText.innerHTML = explanations?.errors?.[errorKey]?.[0];
+    modalExtraText.innerHTML = explanations?.errors?.[errorKey]?.[1];
+
+    modal.classList.remove("hidden");
+    modalBackdrop.classList.remove("hidden");
+}
+
+function closePopup() {
+    modal.classList.add("hidden");
+    modalBackdrop.classList.add("hidden");
+}

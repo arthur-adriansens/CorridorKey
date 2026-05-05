@@ -31,6 +31,8 @@ async function load_project() {
     projectData = await response.json();
     console.log(projectData);
 
+    get_explenations();
+
     videoDuration = projectData.duration;
     totalFrames = projectData.frame_count;
 
@@ -98,6 +100,10 @@ async function load_project() {
     // Update exports list UI
     if (projectData?.exports) {
         update_exports_list();
+    }
+
+    if (projectData?.gpu_info && projectData.gpu_info.devices == 0) {
+        showPopup("GPU not available - Switched to CPU-only Pytorch");
     }
 
     update_view();

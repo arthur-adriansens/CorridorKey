@@ -8,14 +8,14 @@ from pathlib import Path
 from dataclasses import asdict
 from threading import Thread, Lock
 import re, json
-import sys, os, platform, subprocess, logging
+import sys, os, platform, subprocess, asyncio
 
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../..")))
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" # enable exr support by cv2
-logging.getLogger("asyncio").setLevel(logging.ERROR)
 
 import numpy as np
 import cv2
+import torch
 
 # Import corridorKey logic
 from backend.ffmpeg_tools import find_ffmpeg, stitch_video
@@ -59,6 +59,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Ignore ConnectionResetError (client disconnects)
+def _handle_connection_reset(loop, context):
+    exception = context.get('exception')
+    if isinstance(exception, ConnectionResetError):
+        return
+    
+    # Default handler for other exceptions
+    loop.default_exception_handler(context) 
+
+asyncio.get_event_loop().set_exception_handler(_handle_connection_reset)
 
 print("\nServer started! Only (critical) errors and warnings will show up here.")
 
@@ -121,6 +132,9 @@ def project_info(project: str):
 
     if (alpha_path.is_dir() and os.listdir(alpha_path)):
         has_alpha = True
+
+    # check gpu/cuda status
+    gpu_info = {"torch_version": torch.__version__, "available": torch.cuda.is_available(), "devices": torch.cuda.device_count(), "cuda_version": torch.version.cuda}
     
     return {
         "fps": fps,
@@ -131,6 +145,7 @@ def project_info(project: str):
         "birefnet_options": birefnet_options,
         "options": options,
         "has_alpha": has_alpha,
+        "gpu_info": gpu_info
     }
 
 @app.get("/api/checkOutput")
