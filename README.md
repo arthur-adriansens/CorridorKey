@@ -4,7 +4,7 @@ Hi! This web UI was made by Arthur Adriansens. I stepped out of my comfort zone 
 
 Special thanks to EZ-CorridorKey for inspiring this project. A big part of the UI explenations are also from EZ-CorridorKey.
 
-![UI screenshot](./static/images/screenshot.png "UI screenshot")
+![UI screenshot](./webUI/static/images/screenshot.png "UI screenshot")
 
 ## Install
 
